@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { format, addDays } from 'date-fns';
@@ -34,7 +33,7 @@ const platforms = [
   { id: 'facebook', name: 'Facebook', icon: <Facebook />, color: '#4267B2', characterLimit: 63206 },
   { id: 'linkedin', name: 'LinkedIn', icon: <Linkedin />, color: '#0077B5', characterLimit: 3000 },
   { id: 'twitter', name: 'Twitter', icon: <Twitter />, color: '#1DA1F2', characterLimit: 280 },
-  { id: 'pinterest', name: 'Pinterest', icon: <Pinterest />, color: '#E60023', characterLimit: 500 },
+  { id: 'pinterest', name: 'Pinterest', icon: <Twitter />, color: '#E60023', characterLimit: 500 }, // Using Twitter as replacement
   { id: 'youtube', name: 'YouTube', icon: <Youtube />, color: '#FF0000', characterLimit: 5000 },
 ];
 

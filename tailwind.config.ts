@@ -22,10 +22,11 @@ export default {
       colors: {
         // Postsync custom colors - updated for modern look
         postsync: {
+          primary: "#4CAF50",
+          secondary: "#2E7D32",
+          accent: "#81C784",
           background: "#F9FAFB",
           backgroundAlt: "#F1F5F9",
-          primary: "#3B82F6",
-          secondary: "#EC4899",
           text: "#111827",
           muted: "#6B7280",
         },

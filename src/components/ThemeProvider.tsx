@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark';
@@ -30,6 +31,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
+
+    // Apply theme variables to :root
+    if (theme === 'dark') {
+      document.documentElement.style.setProperty('--charts-text', '#e2e8f0');
+      document.documentElement.style.setProperty('--charts-tooltip-bg', '#1e293b');
+    } else {
+      document.documentElement.style.setProperty('--charts-text', '#334155');
+      document.documentElement.style.setProperty('--charts-tooltip-bg', '#ffffff');
+    }
   }, [theme]);
 
   const toggleTheme = () => {

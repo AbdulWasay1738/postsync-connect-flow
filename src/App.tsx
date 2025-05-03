@@ -21,7 +21,14 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
   // Layout wrapper for public pages
@@ -33,39 +40,37 @@ const App = () => {
   );
 
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AuthProvider>
-                <Sidebar>
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    
-                    {/* Protected routes */}
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/calendar" element={<Calendar />} />
-                    <Route path="/create" element={<CreatePost />} />
-                    <Route path="/ai-captions" element={<AICaptions />} />
-                    <Route path="/settings" element={<Settings />} />
-                    
-                    {/* 404 page */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Sidebar>
-              </AuthProvider>
-            </BrowserRouter>
-          </TooltipProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <Sidebar>
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                  
+                  {/* Protected routes */}
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/calendar" element={<Calendar />} />
+                  <Route path="/create" element={<CreatePost />} />
+                  <Route path="/ai-captions" element={<AICaptions />} />
+                  <Route path="/settings" element={<Settings />} />
+                  
+                  {/* 404 page */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Sidebar>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

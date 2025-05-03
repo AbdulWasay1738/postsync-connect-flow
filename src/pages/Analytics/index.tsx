@@ -10,6 +10,57 @@ import Container from '@/components/ui/Container';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+// Type definitions for the platform specific data
+interface InstagramData {
+  reachGrowth: number;
+  impressions: number;
+  profileVisits: number;
+  storiesEngagement: number;
+  topHashtags: string[];
+  bestPostingTimes: string[];
+}
+
+interface FacebookData {
+  pageEngagement: number;
+  clickThroughRate: number;
+  videoViews: number;
+  pageImpressions: number;
+  topPerformingContent: string[];
+  demographicReach: string[];
+}
+
+interface LinkedinData {
+  companyPageClicks: number;
+  followerGrowth: number;
+  contentImpressions: number;
+  profileViews: number;
+  engagementByContentType: string[];
+}
+
+interface TwitterData {
+  impressions: number;
+  profileVisits: number;
+  mentionEngagement: number;
+  topPerformingTweets: string[];
+  retweetRate: number;
+}
+
+interface YoutubeData {
+  viewDuration: string;
+  subscriberGrowth: number;
+  viewThroughRate: number;
+  topVideos: string[];
+  commentEngagement: number;
+}
+
+interface PlatformSpecificData {
+  instagram: InstagramData;
+  facebook: FacebookData;
+  linkedin: LinkedinData;
+  twitter: TwitterData;
+  youtube: YoutubeData;
+}
+
 // Mock data for analytics
 const mockAnalyticsData = {
   pageViews: [
@@ -98,7 +149,7 @@ const mockAnalyticsData = {
       topVideos: ['Tutorial videos', 'Behind the scenes', 'Product reviews'],
       commentEngagement: 3.1
     }
-  }
+  } as PlatformSpecificData
 };
 
 // Helper function to format dates
@@ -190,7 +241,7 @@ const Analytics = () => {
       );
     }
 
-    const platformData = mockAnalyticsData.platformSpecificData[selectedPlatform as keyof typeof mockAnalyticsData.platformSpecificData];
+    const platformData = mockAnalyticsData.platformSpecificData[selectedPlatform as keyof PlatformSpecificData];
     const platform = platforms.find(p => p.id === selectedPlatform);
     
     if (!platformData) return <div>No data available for this platform</div>;
@@ -340,7 +391,7 @@ const Analytics = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {platformData.topHashtags.map((hashtag, index) => (
+                    {(platformData as InstagramData).topHashtags.map((hashtag, index) => (
                       <div key={index} className="bg-primary/10 text-primary px-3 py-1 rounded-full">
                         {hashtag}
                       </div>
@@ -354,7 +405,7 @@ const Analytics = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {platformData.bestPostingTimes.map((time, index) => (
+                    {(platformData as InstagramData).bestPostingTimes.map((time, index) => (
                       <li key={index} className="flex items-center">
                         <div className="w-2 h-2 rounded-full bg-primary mr-2"></div>
                         {time}
@@ -374,7 +425,7 @@ const Analytics = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {platformData.topPerformingContent.map((content, index) => (
+                    {(platformData as FacebookData).topPerformingContent.map((content, index) => (
                       <li key={index} className="flex items-center">
                         <div className="w-2 h-2 rounded-full bg-primary mr-2"></div>
                         {content}
@@ -389,7 +440,7 @@ const Analytics = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {platformData.demographicReach.map((demo, index) => (
+                    {(platformData as FacebookData).demographicReach.map((demo, index) => (
                       <li key={index} className="flex items-center">
                         <div className="w-2 h-2 rounded-full bg-primary mr-2"></div>
                         {demo}
@@ -472,7 +523,7 @@ const Analytics = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis dataKey="date" tickFormatter={formatDate} stroke="var(--muted-foreground)" />
                     <YAxis stroke="var(--muted-foreground)" />
-                    <Tooltip />
+                    <Tooltip contentStyle={{backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)'}} />
                     <Area 
                       type="monotone" 
                       dataKey="views" 
@@ -506,7 +557,7 @@ const Analytics = () => {
                         <Cell key={entry.platform} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip contentStyle={{backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)'}} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -526,7 +577,7 @@ const Analytics = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis dataKey="date" tickFormatter={formatDate} stroke="var(--muted-foreground)" />
                     <YAxis stroke="var(--muted-foreground)" />
-                    <Tooltip />
+                    <Tooltip contentStyle={{backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)'}} />
                     <Legend />
                     <Line type="monotone" dataKey="likes" stroke="#82ca9d" />
                     <Line type="monotone" dataKey="comments" stroke="#8884d8" />
@@ -549,7 +600,7 @@ const Analytics = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                       <XAxis dataKey="age" stroke="var(--muted-foreground)" />
                       <YAxis stroke="var(--muted-foreground)" />
-                      <Tooltip />
+                      <Tooltip contentStyle={{backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)'}} />
                       <Bar dataKey="percentage" fill="var(--primary)" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -577,7 +628,7 @@ const Analytics = () => {
                         <Cell key="male" fill="#36A2EB" />
                         <Cell key="other" fill="#FFCE56" />
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={{backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)'}} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
@@ -597,7 +648,7 @@ const Analytics = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                       <XAxis type="number" stroke="var(--muted-foreground)" />
                       <YAxis dataKey="location" type="category" width={100} stroke="var(--muted-foreground)" />
-                      <Tooltip />
+                      <Tooltip contentStyle={{backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)'}} />
                       <Bar dataKey="percentage" fill="var(--primary)" />
                     </BarChart>
                   </ResponsiveContainer>

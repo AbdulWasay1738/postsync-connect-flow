@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { format, subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Instagram, Facebook, Linkedin, Twitter, Youtube, Users, ThumbsUp, MessageSquare, Share2, BarChart3, Sparkles, PlusCircle, TrendingUp, TrendingDown, Eye } from 'lucide-react';
-import { LineChart, Line, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Container from '@/components/ui/Container';
@@ -38,7 +38,7 @@ const engagementRates = [
   { date: new Date(), instagram: 5.0, facebook: 3.0, linkedin: 3.7, twitter: 5.3, youtube: 4.1 },
 ];
 
-// Social platforms data with updated colors and branding
+// Social platforms data with colors and branding
 const platforms = [
   { id: 'instagram', name: 'Instagram', icon: <Instagram />, color: '#E1306C', logo: '/instagram-logo.png' },
   { id: 'facebook', name: 'Facebook', icon: <Facebook />, color: '#4267B2', logo: '/facebook-logo.png' },
@@ -177,7 +177,7 @@ const Dashboard = () => {
                       stroke="var(--muted-foreground)"
                     />
                     <YAxis stroke="var(--muted-foreground)" />
-                    <Tooltip />
+                    <Tooltip contentStyle={{backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)'}} />
                     <Legend />
                     <Line type="monotone" dataKey="instagram" stroke="#E1306C" name="Instagram" />
                     <Line type="monotone" dataKey="facebook" stroke="#4267B2" name="Facebook" />
@@ -191,38 +191,34 @@ const Dashboard = () => {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-card hover:shadow-hover transition-shadow">
-                <Link to="/create">
-                  <CardContent className="flex flex-col items-center justify-center h-32">
-                    <PlusCircle className="h-10 w-10 mb-2" />
-                    <h3 className="font-medium text-lg">Create Post</h3>
-                  </CardContent>
-                </Link>
-              </Card>
-              <Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-card hover:shadow-hover transition-shadow">
-                <Link to="/ai-captions">
-                  <CardContent className="flex flex-col items-center justify-center h-32">
-                    <Sparkles className="h-10 w-10 mb-2" />
-                    <h3 className="font-medium text-lg">AI Captions</h3>
-                  </CardContent>
-                </Link>
-              </Card>
-              <Card className="bg-gradient-to-br from-green-500 to-teal-500 text-white shadow-card hover:shadow-hover transition-shadow">
-                <Link to="/calendar">
-                  <CardContent className="flex flex-col items-center justify-center h-32">
-                    <PlusCircle className="h-10 w-10 mb-2" />
-                    <h3 className="font-medium text-lg">Schedule Post</h3>
-                  </CardContent>
-                </Link>
-              </Card>
-              <Card className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white shadow-card hover:shadow-hover transition-shadow">
-                <Link to="/analytics">
-                  <CardContent className="flex flex-col items-center justify-center h-32">
-                    <BarChart3 className="h-10 w-10 mb-2" />
-                    <h3 className="font-medium text-lg">Analytics</h3>
-                  </CardContent>
-                </Link>
-              </Card>
+              <QuickActionCard 
+                title="Create Post"
+                icon={<PlusCircle className="h-10 w-10 mb-2" />}
+                to="/create"
+                gradientFrom="#4CAF50"
+                gradientTo="#2E7D32"
+              />
+              <QuickActionCard 
+                title="AI Captions"
+                icon={<Sparkles className="h-10 w-10 mb-2" />}
+                to="/ai-captions" 
+                gradientFrom="#7E57C2" 
+                gradientTo="#5E35B1"
+              />
+              <QuickActionCard 
+                title="Schedule Post"
+                icon={<PlusCircle className="h-10 w-10 mb-2" />}
+                to="/calendar"
+                gradientFrom="#26A69A"
+                gradientTo="#00796B"
+              />
+              <QuickActionCard 
+                title="Analytics"
+                icon={<BarChart3 className="h-10 w-10 mb-2" />}
+                to="/analytics"
+                gradientFrom="#FFA000"
+                gradientTo="#FF6F00"
+              />
             </div>
           </TabsContent>
           
@@ -234,7 +230,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {platformInsights.map(platform => (
-                  <Card key={platform.id} className="shadow-sm dark:bg-card/80">
+                  <Card key={platform.id} className="shadow-sm dark:bg-card/80 hover:shadow-hover transition-all">
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-2">
                         {platforms.find(p => p.id === platform.platform)?.icon}
@@ -280,7 +276,7 @@ const Dashboard = () => {
               <CardContent>
                 <div className="space-y-4">
                   {recentActivities.map(activity => (
-                    <div key={activity.id} className="flex items-center justify-between p-3 rounded-md border">
+                    <div key={activity.id} className="flex items-center justify-between p-3 rounded-md border hover:bg-accent/20 transition-colors">
                       <div className="flex items-center gap-3">
                         {platforms.find(p => p.id === activity.platform)?.icon}
                         <div>
@@ -302,5 +298,28 @@ const Dashboard = () => {
     </div>
   );
 };
+
+// Reusable component for the quick action cards
+interface QuickActionCardProps {
+  title: string;
+  icon: React.ReactNode;
+  to: string;
+  gradientFrom: string;
+  gradientTo: string;
+}
+
+const QuickActionCard = ({ title, icon, to, gradientFrom, gradientTo }: QuickActionCardProps) => (
+  <Link to={to}>
+    <Card 
+      className="hover:shadow-md transition-all h-32 overflow-hidden"
+      style={{ background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})` }}
+    >
+      <CardContent className="flex flex-col items-center justify-center h-full p-6 text-white">
+        {icon}
+        <h3 className="font-medium text-lg">{title}</h3>
+      </CardContent>
+    </Card>
+  </Link>
+);
 
 export default Dashboard;

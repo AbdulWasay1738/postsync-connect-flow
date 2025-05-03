@@ -14,9 +14,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Sun,
-  Moon
+  Moon,
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 type SidebarProps = {
@@ -24,7 +27,7 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ children }: SidebarProps) => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -53,7 +56,7 @@ const Sidebar = ({ children }: SidebarProps) => {
     <div className="flex h-screen">
       {/* Sidebar */}
       <div className={cn(
-        "sidebar transition-all duration-300 border-r bg-sidebar border-sidebar-border",
+        "sidebar transition-all duration-300 border-r bg-sidebar border-sidebar-border relative z-10",
         collapsed ? "w-16" : "w-64"
       )}>
         {/* Logo section */}
@@ -63,16 +66,11 @@ const Sidebar = ({ children }: SidebarProps) => {
         )}>
           {!collapsed && (
             <Link to="/" className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-postsync-primary to-postsync-secondary rounded-md p-1 flex items-center justify-center w-8 h-8">
-                <span className="text-white font-bold">PS</span>
-              </div>
-              <span className="font-inter font-semibold text-xl text-sidebar-foreground">Postsync</span>
+              <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-8" />
             </Link>
           )}
           {collapsed && (
-            <div className="bg-gradient-to-r from-postsync-primary to-postsync-secondary rounded-md p-1 flex items-center justify-center w-8 h-8">
-              <span className="text-white font-bold">PS</span>
-            </div>
+            <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-8" />
           )}
           <Button
             variant="ghost"
@@ -85,7 +83,7 @@ const Sidebar = ({ children }: SidebarProps) => {
         </div>
 
         {/* Navigation links */}
-        <div className="py-4">
+        <div className="py-4 flex-grow">
           <nav className="space-y-1 px-2">
             {navLinks.map((link) => (
               <Link
@@ -106,48 +104,75 @@ const Sidebar = ({ children }: SidebarProps) => {
           </nav>
         </div>
 
-        {/* Bottom actions */}
+        {/* Theme toggle and User Profile */}
         <div className={cn(
-          "absolute bottom-0 w-full p-4 border-t border-sidebar-border",
-          collapsed ? "flex justify-center" : ""
+          "absolute bottom-0 w-full border-t border-sidebar-border",
+          collapsed ? "" : ""
         )}>
+          {/* Theme toggle */}
           <div className={cn(
-            "flex items-center",
-            collapsed ? "flex-col space-y-4" : "justify-between w-full"
+            "p-4",
+            collapsed ? "flex justify-center" : ""
           )}>
             <Button 
               variant="ghost" 
               size={collapsed ? "icon" : "default"} 
               onClick={toggleTheme}
-              className="text-sidebar-foreground"
+              className="text-sidebar-foreground w-full justify-start"
             >
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
               {!collapsed && <span className="ml-2">
                 {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
               </span>}
             </Button>
-            
-            {!collapsed && (
-              <Button 
-                variant="ghost" 
-                size="default"
-                onClick={logout}
-                className="text-sidebar-foreground"
-              >
-                <LogOut size={18} className="mr-2" />
-                Logout
-              </Button>
-            )}
-            
-            {collapsed && (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={logout}
-                className="text-sidebar-foreground"
-              >
-                <LogOut size={18} />
-              </Button>
+          </div>
+          
+          {/* User details section */}
+          <Separator />
+          <div className={cn(
+            "p-4",
+            collapsed ? "flex justify-center" : ""
+          )}>
+            {!collapsed ? (
+              <div className="flex items-center space-x-3">
+                <Avatar>
+                  <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80" alt="User" />
+                  <AvatarFallback>
+                    <User size={18} />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">Sarah Johnson</p>
+                  <p className="text-xs text-muted-foreground truncate">sarah@example.com</p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={logout}
+                  className="text-sidebar-foreground"
+                  title="Logout"
+                >
+                  <LogOut size={16} />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center space-y-2">
+                <Avatar>
+                  <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80" alt="User" />
+                  <AvatarFallback>
+                    <User size={18} />
+                  </AvatarFallback>
+                </Avatar>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={logout}
+                  className="text-sidebar-foreground"
+                  title="Logout"
+                >
+                  <LogOut size={16} />
+                </Button>
+              </div>
             )}
           </div>
         </div>

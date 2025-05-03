@@ -42,7 +42,7 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Link to="/" className="flex items-center">
-            <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="Postsync Logo" className="h-16" />
+            <img src="/logo.svg" alt="Postsync Logo" className="h-16" />
           </Link>
         </div>
         

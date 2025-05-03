@@ -66,11 +66,12 @@ const Sidebar = ({ children }: SidebarProps) => {
         )}>
           {!collapsed && (
             <Link to="/" className="flex items-center space-x-2">
-              <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-10" />
+              <img src="/logo.svg" alt="PostSync Logo" className="h-9 w-9" />
+              <span className="font-inter font-semibold text-lg">Postsync</span>
             </Link>
           )}
           {collapsed && (
-            <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-8" />
+            <img src="/logo.svg" alt="PostSync Logo" className="h-8 w-8" />
           )}
           <Button
             variant="ghost"

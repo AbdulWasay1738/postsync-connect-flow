@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -96,7 +95,8 @@ const LandingPage = () => {
       <nav className="py-4 px-6 bg-background/80 backdrop-blur-sm border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-10" />
+            <img src="/logo.svg" alt="PostSync Logo" className="h-10 w-10" />
+            <span className="font-inter font-semibold text-xl">Postsync</span>
           </div>
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" className="text-foreground hover:text-primary">
@@ -114,7 +114,7 @@ const LandingPage = () => {
         <Container>
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-6 flex justify-center">
-              <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-20" />
+              <img src="/logo.svg" alt="PostSync Logo" className="h-20 w-20" />
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-inter leading-tight mb-6">
               Streamline Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-postsync-accent to-postsync-primary">Social Media</span> Management

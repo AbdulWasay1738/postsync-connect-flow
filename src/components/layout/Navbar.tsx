@@ -39,9 +39,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-2">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-md p-1 flex items-center justify-center w-8 h-8">
-                <span className="text-white font-bold">PS</span>
-              </div>
+              <img src="/logo.svg" alt="PostSync Logo" className="h-9 w-9" />
               <span className="font-inter font-semibold text-xl">Postsync</span>
             </Link>
           </div>

@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format, isSameMonth, isSameDay, addDays, subDays } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
@@ -76,7 +77,7 @@ const mockEvents = [
 const ContentCalendar = () => {
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   
   const getPlatformColor = (platform: string) => {
     switch (platform.toLowerCase()) {
@@ -116,13 +117,14 @@ const ContentCalendar = () => {
     }
   };
   
-  const handleEventClick = (event) => {
+  const handleEventClick = (event: any) => {
     setSelectedEvent(event);
     setOpen(true);
   };
   
-  const renderDayContent = (date: Date) => {
-    const events = mockEvents.filter(event => isSameDay(event.date, date));
+  // Custom day cell content renderer with event indicators
+  const renderDayContent = (day: Date) => {
+    const events = mockEvents.filter(event => isSameDay(event.date, day));
     
     if (events.length === 0) return null;
     
@@ -168,7 +170,6 @@ const ContentCalendar = () => {
                 onSelect={setDate}
                 initialFocus
                 className="p-0 pointer-events-auto"
-                renderDayContent={renderDayContent}
               />
               
               <div className="absolute top-2 right-2 flex items-center space-x-2">

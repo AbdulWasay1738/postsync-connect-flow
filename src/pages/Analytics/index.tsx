@@ -3,7 +3,7 @@ import { format, subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Instagram, Facebook, Linkedin, Twitter, Youtube } from 'lucide-react';
-import { AreaChart, Area, LineChart, Line, PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, LineChart, Line, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Container from '@/components/ui/Container';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -100,6 +100,17 @@ const Analytics = () => {
         return null;
     }
   };
+
+  // Generate random colors for the pie chart
+  const generateRandomColors = (count: number) => {
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+      colors.push(`#${Math.floor(Math.random() * 16777215).toString(16)}`);
+    }
+    return colors;
+  };
+
+  const pieColors = generateRandomColors(getFilteredPlatformDistribution().length);
 
   return (
     <div className="min-h-screen pb-12">
@@ -214,7 +225,7 @@ const Analytics = () => {
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
                       {getFilteredPlatformDistribution().map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={`#${Math.floor(Math.random() * 16777215).toString(16)}`} />
+                        <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                       ))}
                     </Pie>
                     <Tooltip />

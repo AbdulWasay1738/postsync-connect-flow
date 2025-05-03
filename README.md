@@ -1,73 +1,101 @@
-# Welcome to your Lovable project
 
-## Project info
+# Postsync – Modern Minimalist Social Media Management SaaS
 
-**URL**: https://lovable.dev/projects/d91fca8a-8d22-48b3-b937-b95adc723ac7
+Postsync is a comprehensive social media management platform that helps users schedule, publish, and analyze content across multiple platforms from a single dashboard.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Multi-platform Publishing:** Schedule and publish content across all your social media accounts from a single dashboard.
+- **Performance Analytics:** Track engagement, growth, and content performance with detailed analytics and reports.
+- **Content Calendar:** Plan your content strategy with an intuitive drag-and-drop visual calendar.
+- **AI-Generated Content:** Create captions, hashtags, and content ideas with our advanced AI tools.
+- **Bulk Scheduling:** Save time by scheduling multiple posts across different platforms at once.
+- **Team Collaboration:** Work seamlessly with your team with approval workflows and shared calendars.
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d91fca8a-8d22-48b3-b937-b95adc723ac7) and start prompting.
+- **Frontend:** React, TypeScript, Tailwind CSS
+- **UI Components:** shadcn/ui
+- **Routing:** react-router-dom v6
+- **State Management:** React Context + hooks
+- **Charts:** recharts
+- **Icons:** lucide-react
+- **Form Handling:** react-hook-form
+- **Date Handling:** date-fns
 
-Changes made via Lovable will be committed automatically to this repo.
+## Backend Integration Points
 
-**Use your preferred IDE**
+The following locations have been marked with `// 🔌 BACKEND_HOOK: [functionName]` to indicate where backend integration will be needed:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Authentication
+- `src/context/AuthContext.tsx` - User authentication operations
+  - `authenticateUser(email, password)`
+  - `registerUser(name, email, password)`
+  - `logoutUser()`
+  - `socialLogin(provider)`
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Dashboard
+- `src/pages/Dashboard/index.tsx`
+  - `fetchFollowersAggregate()`
+  - `fetchPlatformSummary(platformId)`
 
-Follow these steps:
+### Analytics
+- `src/pages/Analytics/index.tsx`
+  - `fetchAnalytics(platformId, dateRange)`
+  - `exportAnalytics(platform, dateRange)`
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Calendar
+- `src/pages/Calendar/index.tsx`
+  - `fetchCalendarEvents()`
+  - `updateEvent()`
+  - `deleteEvent()`
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Create Post
+- `src/pages/CreatePost/index.tsx`
+  - `submitPost(data, selectedPlatforms, uploadedFiles)`
+  - `generateHashtags(content, uploadedFiles)`
 
-# Step 3: Install the necessary dependencies.
-npm i
+### AI Captions
+- `src/pages/AICaptions/index.tsx`
+  - `generateCaption(uploadedImage, customPrompt)`
+  - `setCreatePostData(finalCaption, uploadedImage)`
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Settings
+- `src/pages/Settings/index.tsx`
+  - `saveSettings(section, data)`
+  - `connectAccount(accountId)`
+  - `disconnectAccount(accountId)`
+  - `inviteTeamMember(email, role)`
+  - `removeTeamMember(memberId)`
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+```bash
+npm install
+```
+3. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Building for Production
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run build
+```
 
-**Use GitHub Codespaces**
+## License
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This project is private and confidential.
 
-## What technologies are used for this project?
+## Future Development
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/d91fca8a-8d22-48b3-b937-b95adc723ac7) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Backend API integration
+- Authentication with JWT
+- MongoDB database integration
+- Real-time notifications
+- Enhanced analytics reporting
+- Dark mode toggle
+- PWA capabilities

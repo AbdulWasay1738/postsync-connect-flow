@@ -33,7 +33,7 @@ const platforms = [
   },
 ];
 
-// Modern features with updated descriptions
+// Features with updated descriptions
 const features = [
   {
     title: "Multi-Platform Publishing",
@@ -67,7 +67,7 @@ const features = [
   }
 ];
 
-// Modern testimonials
+// Testimonials
 const testimonials = [
   {
     quote: "PostSync transformed how we manage our social presence. Their AI caption feature alone saves us hours every week.",
@@ -92,21 +92,38 @@ const testimonials = [
 const LandingPage = () => {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
+      {/* Navigation bar with login/signup */}
+      <nav className="py-4 px-6 bg-background/80 backdrop-blur-sm border-b border-border sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-10" />
+          </div>
+          <div className="flex items-center gap-4">
+            <Button asChild variant="ghost" className="text-foreground hover:text-primary">
+              <Link to="/login">Log in</Link>
+            </Button>
+            <Button asChild className="bg-primary hover:bg-primary/90">
+              <Link to="/signup">Sign up</Link>
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section - More minimalist and modern */}
       <section className="py-16 md:py-24 bg-gradient-to-br from-background via-background to-accent/10 dark:from-background dark:to-accent/5">
         <Container>
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-6 flex justify-center">
-              <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-12" />
+              <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-20" />
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-inter leading-tight mb-6">
-              Streamline Your <span className="gradient-text">Social Media</span> Management
+              Streamline Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-postsync-accent to-postsync-primary">Social Media</span> Management
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Schedule, publish, and analyze all your social media content from one powerful platform. Save time with AI-powered features.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+              <Button asChild size="lg" className="bg-postsync-primary hover:bg-postsync-secondary transition-colors">
                 <Link to="/signup">Start Free Trial</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
@@ -139,7 +156,7 @@ const LandingPage = () => {
         </Container>
       </section>
 
-      {/* Features Section - More minimal with cleaner cards */}
+      {/* Features Section */}
       <section id="features" className="py-16 bg-background">
         <Container>
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -159,7 +176,7 @@ const LandingPage = () => {
         </Container>
       </section>
 
-      {/* How It Works Section - Simplified */}
+      {/* How It Works Section */}
       <section className="py-16 bg-accent/10 dark:bg-accent/5">
         <Container>
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -181,7 +198,7 @@ const LandingPage = () => {
         </Container>
       </section>
 
-      {/* Testimonials Section - More minimalist */}
+      {/* Testimonials Section */}
       <section className="py-16 bg-background">
         <Container>
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -201,8 +218,8 @@ const LandingPage = () => {
         </Container>
       </section>
 
-      {/* CTA Section - Updated colors and more modern */}
-      <section className="py-16 bg-gradient-to-r from-primary/90 to-primary-foreground/5 dark:from-primary/80 dark:to-primary/20 text-white">
+      {/* CTA Section - Updated colors */}
+      <section className="py-16 bg-gradient-to-r from-postsync-primary/90 to-postsync-accent/50 dark:from-postsync-primary/80 dark:to-postsync-accent/30 text-white">
         <Container>
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold font-inter mb-4">
@@ -211,7 +228,7 @@ const LandingPage = () => {
             <p className="text-lg opacity-90 mb-8">
               Join thousands of marketers and businesses who trust PostSync
             </p>
-            <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-gray-100">
+            <Button asChild size="lg" variant="secondary" className="bg-white text-postsync-primary hover:bg-gray-100">
               <Link to="/signup" className="inline-flex items-center">
                 Start Your Free Trial <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -229,7 +246,7 @@ const LandingPage = () => {
   );
 };
 
-// Helper components for a more DRY and maintainable landing page
+// Helper components 
 const Feature = ({ text }: { text: string }) => (
   <div className="flex items-center justify-center sm:justify-start">
     <CheckCircle className="h-5 w-5 mr-2 opacity-80" /> 
@@ -262,7 +279,7 @@ interface StepProps {
 const Step = ({ number, title, description }: StepProps) => (
   <div className="relative z-10">
     <div className="flex flex-col items-center text-center">
-      <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-lg mb-4">
+      <div className="w-12 h-12 rounded-full bg-postsync-primary flex items-center justify-center text-white font-semibold text-lg mb-4">
         {number}
       </div>
       <h3 className="font-inter font-semibold text-xl mb-3">{title}</h3>
@@ -282,7 +299,7 @@ interface TestimonialCardProps {
 
 const TestimonialCard = ({ testimonial }: TestimonialCardProps) => (
   <div className="p-6 rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow">
-    <div className="mb-4 text-primary">
+    <div className="mb-4 text-postsync-accent">
       <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
         <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
       </svg>

@@ -16,17 +16,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
 
-    /* Updated to green palette instead of blue */
-    --primary: 122 39% 49%;
+    /* Updated to purple palette instead of green */
+    --primary: 262 83% 63%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 120 38% 38%;
+    --secondary: 263 60% 54%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 122 41% 72%;
+    --accent: 316 70% 60%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -34,19 +34,19 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 122 39% 49%;
+    --ring: 262 83% 63%;
 
     --radius: 0.75rem;
 
     /* Sidebar customization */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 122 39% 49%;
+    --sidebar-primary: 262 83% 63%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 210 40% 96.1%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 122 39% 49%;
+    --sidebar-ring: 262 83% 63%;
 
     /* Chart colors for light mode */
     --charts-text: #334155;
@@ -63,16 +63,16 @@
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
 
-    --primary: 142 71% 45%;
+    --primary: 262 83% 68%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 120 38% 28%;
+    --secondary: 263 60% 48%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 142 71% 25%;
+    --accent: 316 70% 50%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -80,16 +80,16 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 142 76% 36%;
+    --ring: 262 83% 68%;
     
     --sidebar-background: 217.2 32.6% 17.5%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 142 71% 45%;
+    --sidebar-primary: 262 83% 68%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 223 47% 11%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 216 34% 17%;
-    --sidebar-ring: 142 76% 36%;
+    --sidebar-ring: 262 83% 68%;
 
     /* Chart colors for dark mode */
     --charts-text: #e2e8f0;

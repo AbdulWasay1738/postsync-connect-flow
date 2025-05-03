@@ -1,328 +1,382 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { format, isSameDay, addDays, parseISO } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Separator } from '@/components/ui/separator';
-import { Instagram, Facebook, Linkedin, Twitter, Youtube, Plus, X } from 'lucide-react';
-import Container from '@/components/ui/Container';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-// Mock data for events
-const mockEvents = [
+// Sample scheduled posts
+const initialPosts = [
   {
-    id: '1',
-    date: new Date(),
+    id: 1,
+    title: 'New Product Launch',
+    date: '2023-11-15T10:00:00',
     platform: 'instagram',
-    content: 'Check out our latest post!',
-    time: '09:00 AM',
+    status: 'scheduled'
   },
   {
-    id: '2',
-    date: addDays(new Date(), 2),
+    id: 2,
+    title: 'Weekend Sale Announcement',
+    date: '2023-11-17T14:30:00',
     platform: 'facebook',
-    content: 'Don\'t miss our live event!',
-    time: '02:30 PM',
+    status: 'scheduled'
   },
   {
-    id: '3',
-    date: addDays(new Date(), 2),
-    platform: 'linkedin',
-    content: 'New job opportunities available!',
-    time: '11:15 AM',
-  },
-  {
-    id: '4',
-    date: addDays(new Date(), 5),
+    id: 3,
+    title: 'Customer Testimonial',
+    date: '2023-11-20T09:00:00',
     platform: 'twitter',
-    content: 'Breaking news!',
-    time: '04:45 PM',
+    status: 'scheduled'
   },
   {
-    id: '5',
-    date: addDays(new Date(), 7),
+    id: 4,
+    title: 'Industry News Share',
+    date: '2023-11-22T16:00:00',
+    platform: 'linkedin',
+    status: 'draft'
+  },
+  {
+    id: 5,
+    title: 'Tutorial Video',
+    date: '2023-11-24T11:00:00',
     platform: 'youtube',
-    content: 'New video tutorial!',
-    time: '10:00 AM',
+    status: 'scheduled'
   },
   {
-    id: '6',
-    date: addDays(new Date(), 10),
+    id: 6,
+    title: 'Black Friday Promotion',
+    date: '2023-11-24T15:00:00',
     platform: 'instagram',
-    content: 'Behind the scenes!',
-    time: '03:20 PM',
-  },
-  {
-    id: '7',
-    date: addDays(new Date(), 12),
-    platform: 'facebook',
-    content: 'Special discount for our followers!',
-    time: '08:45 AM',
+    status: 'scheduled'
   }
 ];
 
-const ContentCalendar = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [open, setOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+type Post = {
+  id: number;
+  title: string;
+  date: string;
+  platform: string;
+  status: string;
+};
 
-  // Get events for the selected day
-  const getSelectedDayEvents = () => {
-    if (!date) return [];
-    return mockEvents
-      .filter(event => isSameDay(event.date, date))
-      .sort((a, b) => a.time.localeCompare(b.time));
+const CalendarPage = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [selectedPlatform, setSelectedPlatform] = useState('all');
+  
+  // Move to previous month
+  const prevMonth = () => {
+    setCurrentDate(prev => subMonths(prev, 1));
   };
   
-  const getPlatformColor = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'instagram':
-        return '#E1306C';
-      case 'facebook':
-        return '#4267B2';
-      case 'linkedin':
-        return '#0077B5';
-      case 'twitter':
-        return '#1DA1F2';
-      case 'youtube':
-        return '#FF0000';
-      default:
-        return '#000';
-    }
+  // Move to next month
+  const nextMonth = () => {
+    setCurrentDate(prev => addMonths(prev, 1));
   };
   
-  const getPlatformIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'instagram':
-        return <Instagram size={16} className="text-[#E1306C]" />;
-      case 'facebook':
-        return <Facebook size={16} className="text-[#4267B2]" />;
-      case 'linkedin':
-        return <Linkedin size={16} className="text-[#0077B5]" />;
-      case 'twitter':
-        return <Twitter size={16} className="text-[#1DA1F2]" />;
-      case 'youtube':
-        return <Youtube size={16} className="text-[#FF0000]" />;
-      default:
-        return null;
-    }
+  // Filter posts by platform
+  const filteredPosts = selectedPlatform === 'all' 
+    ? posts 
+    : posts.filter(post => post.platform === selectedPlatform);
+  
+  // Get posts for selected date
+  const postsForSelectedDate = selectedDate 
+    ? filteredPosts.filter(post => {
+        const postDate = parseISO(post.date);
+        return isSameDay(postDate, selectedDate);
+      })
+    : [];
+  
+  // Function to check if a date has scheduled posts
+  const hasPostsOnDate = (date: Date) => {
+    return filteredPosts.some(post => {
+      const postDate = parseISO(post.date);
+      return isSameDay(postDate, date);
+    });
   };
   
-  const handleEventClick = (event: any) => {
-    setSelectedEvent(event);
-    setOpen(true);
+  // Function to delete a post
+  const deletePost = (id: number) => {
+    setPosts(prev => prev.filter(post => post.id !== id));
   };
-
-  // Get all days with events for the calendar
-  const daysWithEvents = mockEvents.map(event => event.date);
+  
+  // Generate days for the calendar
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  
+  // Get the day of the week for the first day of the month (0 = Sunday, 6 = Saturday)
+  const startDay = monthStart.getDay();
+  
+  // Generate blank days for the start of the month
+  const blankDays = Array.from({ length: startDay }, (_, i) => i);
+  
+  // Platform colors
+  const platformColors: Record<string, string> = {
+    instagram: 'bg-pink-500',
+    facebook: 'bg-blue-500',
+    twitter: 'bg-sky-400',
+    linkedin: 'bg-blue-700',
+    youtube: 'bg-red-600',
+    draft: 'bg-gray-400'
+  };
 
   return (
-    <div className="min-h-screen pb-12 animate-fade-in">
-      <Container>
-        <div className="py-8">
-          <h1 className="text-2xl md:text-3xl font-bold font-inter mb-2">
-            Content Calendar
-          </h1>
-          <p className="text-muted-foreground">
-            Plan and schedule your social media content
-          </p>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Content Calendar</h1>
+          <p className="text-muted-foreground">Manage and schedule your social media posts</p>
         </div>
-        
-        <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-            {/* Calendar - takes more space for better visibility */}
-            <div className="lg:col-span-4">
-              <Card className="shadow-card dark:bg-card">
-                <CardHeader>
-                  <CardTitle className="text-lg font-medium">
-                    Calendar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 md:p-2">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    className="rounded-md border w-full max-w-none"
-                    modifiers={{
-                      event: (day) => daysWithEvents.some(eventDay => isSameDay(day, eventDay)),
-                    }}
-                    modifiersStyles={{
-                      event: {
-                        fontWeight: "bold",
-                        textDecoration: "underline",
-                        textDecorationColor: "var(--primary)",
-                        textDecorationThickness: "2px",
-                        position: "relative",
-                      }
-                    }}
-                    styles={{
-                      day_today: {
-                        backgroundColor: "var(--primary)",
-                        color: "var(--primary-foreground)",
-                      }
-                    }}
-                  />
-                </CardContent>
-              </Card>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select platform" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Platforms</SelectItem>
+              <SelectItem value="instagram">Instagram</SelectItem>
+              <SelectItem value="facebook">Facebook</SelectItem>
+              <SelectItem value="twitter">Twitter</SelectItem>
+              <SelectItem value="linkedin">LinkedIn</SelectItem>
+              <SelectItem value="youtube">YouTube</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button className="bg-postsync-primary hover:bg-postsync-secondary">
+            <Plus className="mr-2 h-4 w-4" />
+            New Post
+          </Button>
+        </div>
+      </div>
+      
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Calendar */}
+        <Card className="flex-1 shadow-md">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl">{format(currentDate, 'MMMM yyyy')}</CardTitle>
+              <div className="flex gap-2">
+                <Button onClick={prevMonth} size="icon" variant="outline">
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button onClick={nextMonth} size="icon" variant="outline">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Days of the week */}
+            <div className="grid grid-cols-7 mb-2">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                <div key={day} className="text-center font-medium text-sm py-2">
+                  {day}
+                </div>
+              ))}
             </div>
             
-            {/* Scheduled posts for the selected day */}
-            <div className="lg:col-span-3">
-              <Card className="shadow-card dark:bg-card">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-lg font-medium">
-                    {date ? format(date, 'MMMM d, yyyy') : 'No date selected'}
-                  </CardTitle>
-                  <Link to="/create">
-                    <Button size="sm" variant="outline">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Post
-                    </Button>
-                  </Link>
-                </CardHeader>
-                <CardContent>
-                  {getSelectedDayEvents().length > 0 ? (
-                    <div className="space-y-3">
-                      {getSelectedDayEvents().map(event => (
-                        <div 
-                          key={event.id}
-                          className="p-3 rounded-lg border hover:bg-accent/30 transition-colors cursor-pointer flex items-center justify-between"
-                          onClick={() => handleEventClick(event)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="h-9 w-9 flex items-center justify-center rounded-full" style={{ backgroundColor: `${getPlatformColor(event.platform)}20` }}>
-                              {getPlatformIcon(event.platform)}
-                            </div>
-                            <div>
-                              <p className="font-medium">{event.time}</p>
-                              <p className="text-sm text-muted-foreground line-clamp-1">{event.content}</p>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <span className="sr-only">View details</span>
-                            <span className="text-lg">→</span>
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-6 text-center">
-                      <div className="rounded-full bg-muted/30 p-3">
-                        <CalendarIcon className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                      <h3 className="mt-3 font-medium">No posts scheduled</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        No content scheduled for this day.
-                      </p>
-                      <Button className="mt-4" asChild>
-                        <Link to="/create">Schedule Post</Link>
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-          
-          {/* All upcoming posts */}
-          <Card className="shadow-card dark:bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium">Upcoming Posts</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {mockEvents
-                  .filter(event => event.date >= new Date())
-                  .sort((a, b) => a.date.getTime() - b.date.getTime())
-                  .slice(0, 6) // Show only next 6 posts
-                  .map(event => (
-                    <div 
-                      key={event.id}
-                      className="p-4 rounded-lg border hover:shadow-md transition-all cursor-pointer"
-                      onClick={() => handleEventClick(event)}
+            {/* Calendar grid */}
+            <div className="grid grid-cols-7 gap-1">
+              {/* Blank days */}
+              {blankDays.map((_, i) => (
+                <div key={`blank-${i}`} className="aspect-square p-1"></div>
+              ))}
+              
+              {/* Days in month */}
+              {daysInMonth.map((day) => {
+                const isToday = isSameDay(day, new Date());
+                const isSelected = selectedDate && isSameDay(day, selectedDate);
+                const hasEvents = hasPostsOnDate(day);
+                
+                return (
+                  <div
+                    key={day.toISOString()}
+                    className={cn(
+                      "aspect-square p-1",
+                      !isSameMonth(day, currentDate) && "text-muted-foreground"
+                    )}
+                  >
+                    <button
+                      onClick={() => setSelectedDate(day)}
+                      className={cn(
+                        "w-full h-full flex items-center justify-center rounded-full relative",
+                        isToday && "border border-primary font-semibold",
+                        isSelected && "bg-primary text-primary-foreground",
+                        !isSelected && hasEvents && "font-medium"
+                      )}
                     >
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="h-7 w-7 flex items-center justify-center rounded-full" style={{ backgroundColor: `${getPlatformColor(event.platform)}20` }}>
-                          {getPlatformIcon(event.platform)}
-                        </div>
-                        <span className="text-sm font-medium" style={{ color: getPlatformColor(event.platform) }}>
-                          {event.platform.charAt(0).toUpperCase() + event.platform.slice(1)}
-                        </span>
-                      </div>
-                      <p className="line-clamp-2 mb-3 text-sm">{event.content}</p>
-                      <div className="flex justify-between items-center text-xs text-muted-foreground">
-                        <span>{format(event.date, 'MMM d')}</span>
-                        <span>{event.time}</span>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-              {mockEvents.filter(event => event.date >= new Date()).length > 6 && (
-                <div className="mt-4 flex justify-center">
-                  <Button variant="outline">View All Scheduled Posts</Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                      {format(day, 'd')}
+                      {hasEvents && (
+                        <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-postsync-primary"></span>
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
         
-        {/* Event Details Sheet */}
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent className="sm:max-w-lg">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
-                {selectedEvent && getPlatformIcon(selectedEvent.platform)}
-                <span>Post Details</span>
-              </SheetTitle>
-              <SheetDescription>
-                {selectedEvent && format(selectedEvent.date, 'PPPP')} at {selectedEvent?.time}
-              </SheetDescription>
-            </SheetHeader>
-            <Separator className="my-4" />
-            {selectedEvent && (
+        {/* Scheduled Posts for Selected Date */}
+        <Card className="w-full lg:w-96 shadow-md">
+          <CardHeader>
+            <CardTitle>
+              {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Scheduled Posts'}
+            </CardTitle>
+            <CardDescription>
+              {selectedDate 
+                ? postsForSelectedDate.length > 0 
+                  ? `${postsForSelectedDate.length} post${postsForSelectedDate.length === 1 ? '' : 's'} scheduled` 
+                  : 'No posts scheduled' 
+                : 'Select a date to view scheduled posts'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!selectedDate ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Select a date on the calendar to view scheduled posts.
+              </div>
+            ) : postsForSelectedDate.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No posts scheduled for this date.
+              </div>
+            ) : (
               <div className="space-y-4">
-                <div>
-                  <p className="font-medium mb-1">Platform</p>
-                  <p className="text-muted-foreground capitalize">{selectedEvent.platform}</p>
-                </div>
-                <div>
-                  <p className="font-medium mb-1">Content</p>
-                  <p>{selectedEvent.content}</p>
-                </div>
-                <div className="flex justify-end gap-3 mt-6">
-                  <Button variant="outline">Edit</Button>
-                  <Button>Share Now</Button>
-                </div>
+                {postsForSelectedDate.map(post => (
+                  <div key={post.id} className="p-3 border rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-medium">{post.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {format(parseISO(post.date), 'h:mm a')}
+                        </p>
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Trash2 className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Delete Post</DialogTitle>
+                            <DialogDescription>
+                              Are you sure you want to delete this post? This action cannot be undone.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button variant="ghost">Cancel</Button>
+                            <Button 
+                              variant="destructive" 
+                              onClick={() => deletePost(post.id)}
+                            >
+                              Delete
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <Badge className={cn("capitalize", platformColors[post.platform] || "bg-gray-500")}>
+                        {post.platform}
+                      </Badge>
+                      <Badge variant="outline" className={post.status === 'scheduled' ? 'border-green-500 text-green-600' : 'border-amber-500 text-amber-600'}>
+                        {post.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
-          </SheetContent>
-        </Sheet>
-      </Container>
+          </CardContent>
+          <CardFooter className="justify-end">
+            {selectedDate && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Create Post</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Post</DialogTitle>
+                    <DialogDescription>
+                      Schedule a post for {selectedDate && format(selectedDate, 'MMMM d, yyyy')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    {/* Post creation form would go here */}
+                    <p className="text-center text-muted-foreground">Post creation form placeholder</p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </CardFooter>
+        </Card>
+      </div>
+
+      {/* Upcoming Posts Section */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">Upcoming Posts</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPosts
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .slice(0, 6)
+            .map(post => (
+              <Card key={post.id} className="shadow-md">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between">
+                    <CardTitle className="text-lg">{post.title}</CardTitle>
+                    <Badge className={cn("capitalize", platformColors[post.platform] || "bg-gray-500")}>
+                      {post.platform}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    {format(parseISO(post.date), 'MMMM d, yyyy')} at {format(parseISO(post.date), 'h:mm a')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm pb-3">
+                  <Badge variant="outline" className={post.status === 'scheduled' ? 'border-green-500 text-green-600' : 'border-amber-500 text-amber-600'}>
+                    {post.status}
+                  </Badge>
+                </CardContent>
+                <CardFooter className="pt-0 flex justify-end gap-2">
+                  <Button variant="outline" size="sm">Edit</Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Delete Post</DialogTitle>
+                        <DialogDescription>
+                          Are you sure you want to delete this post? This action cannot be undone.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button variant="ghost">Cancel</Button>
+                        <Button 
+                          variant="destructive" 
+                          onClick={() => deletePost(post.id)}
+                        >
+                          Delete
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </CardFooter>
+              </Card>
+            ))}
+        </div>
+      </div>
     </div>
   );
 };
 
-const CalendarIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-    <line x1="16" x2="16" y1="2" y2="6" />
-    <line x1="8" x2="8" y1="2" y2="6" />
-    <line x1="3" x2="21" y1="10" y2="10" />
-  </svg>
-);
-
-export default ContentCalendar;
+export default CalendarPage;

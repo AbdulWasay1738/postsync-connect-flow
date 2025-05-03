@@ -66,7 +66,7 @@ const Sidebar = ({ children }: SidebarProps) => {
         )}>
           {!collapsed && (
             <Link to="/" className="flex items-center space-x-2">
-              <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-8" />
+              <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="PostSync Logo" className="h-10" />
             </Link>
           )}
           {collapsed && (
@@ -105,10 +105,7 @@ const Sidebar = ({ children }: SidebarProps) => {
         </div>
 
         {/* Theme toggle and User Profile */}
-        <div className={cn(
-          "absolute bottom-0 w-full border-t border-sidebar-border",
-          collapsed ? "" : ""
-        )}>
+        <div className="absolute bottom-0 w-full border-t border-sidebar-border">
           {/* Theme toggle */}
           <div className={cn(
             "p-4",

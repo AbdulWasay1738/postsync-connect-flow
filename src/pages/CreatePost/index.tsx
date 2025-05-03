@@ -1,529 +1,390 @@
+
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { format, addDays } from 'date-fns';
-import { 
-  Upload, 
-  X, 
-  Image, 
-  Video, 
-  FileText, 
-  Calendar as CalendarIcon, 
-  Clock, 
-  Instagram, 
-  Facebook, 
-  Linkedin, 
-  Twitter, 
-  Pinterest, 
-  Youtube 
-} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Container from '@/components/ui/Container';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Calendar as CalendarIcon, Clock, Image as ImageIcon, Link, Plus, Instagram, Facebook, Twitter, Linkedin, Youtube, ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-// Social platforms data
-const platforms = [
-  { id: 'instagram', name: 'Instagram', icon: <Instagram />, color: '#E1306C', characterLimit: 2200 },
-  { id: 'facebook', name: 'Facebook', icon: <Facebook />, color: '#4267B2', characterLimit: 63206 },
-  { id: 'linkedin', name: 'LinkedIn', icon: <Linkedin />, color: '#0077B5', characterLimit: 3000 },
-  { id: 'twitter', name: 'Twitter', icon: <Twitter />, color: '#1DA1F2', characterLimit: 280 },
-  { id: 'pinterest', name: 'Pinterest', icon: <Twitter />, color: '#E60023', characterLimit: 500 }, // Using Twitter as replacement
-  { id: 'youtube', name: 'YouTube', icon: <Youtube />, color: '#FF0000', characterLimit: 5000 },
-];
-
-// Timezone data
-const timezones = [
-  { value: 'America/New_York', label: '(GMT-5) Eastern Time' },
-  { value: 'America/Chicago', label: '(GMT-6) Central Time' },
-  { value: 'America/Denver', label: '(GMT-7) Mountain Time' },
-  { value: 'America/Los_Angeles', label: '(GMT-8) Pacific Time' },
-  { value: 'Europe/London', label: '(GMT+0) Greenwich Mean Time' },
-  { value: 'Europe/Paris', label: '(GMT+1) Central European Time' },
-  { value: 'Asia/Tokyo', label: '(GMT+9) Japan Standard Time' },
-  { value: 'Australia/Sydney', label: '(GMT+10) Australian Eastern Time' },
-];
-
-interface FormData {
-  content: string;
-  date: Date;
-  time: string;
-  timezone: string;
-}
-
-const CreatePost = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [uploadedFilesPreviews, setUploadedFilesPreviews] = useState<string[]>([]);
-  const [showFileUpload, setShowFileUpload] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+const CreatePostPage = () => {
+  const [postContent, setPostContent] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [scheduleDate, setScheduleDate] = useState<string>('');
+  const [scheduleTime, setScheduleTime] = useState<string>('');
   
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
-    defaultValues: {
-      content: '',
-      date: addDays(new Date(), 1),
-      time: '10:00',
-      timezone: 'America/New_York',
-    },
+  // Platform selection state
+  const [platforms, setPlatforms] = useState({
+    instagram: true,
+    facebook: true,
+    twitter: false,
+    linkedin: false,
+    youtube: false
   });
   
-  const content = watch('content');
-  const date = watch('date');
-  
-  const togglePlatform = (platformId: string) => {
-    setSelectedPlatforms(prev => 
-      prev.includes(platformId)
-        ? prev.filter(id => id !== platformId)
-        : [...prev, platformId]
-    );
-  };
-  
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    
-    const newFiles = Array.from(files);
-    setUploadedFiles(prev => [...prev, ...newFiles]);
-    
-    // Create previews
-    newFiles.forEach(file => {
+  // Handle image upload
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setUploadedFilesPreviews(prev => [...prev, e.target!.result as string]);
-        }
+      reader.onload = (event) => {
+        setSelectedImage(file.name);
+        setPreviewImage(event.target?.result as string);
       };
       reader.readAsDataURL(file);
-    });
-  };
-  
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-    setUploadedFilesPreviews(prev => prev.filter((_, i) => i !== index));
-  };
-  
-  const getFileIcon = (fileType: string) => {
-    if (fileType.startsWith('image/')) return <Image size={20} />;
-    if (fileType.startsWith('video/')) return <Video size={20} />;
-    return <FileText size={20} />;
-  };
-  
-  const nextStep = () => {
-    if (currentStep === 1 && selectedPlatforms.length === 0) {
-      alert('Please select at least one platform');
-      return;
     }
-    setCurrentStep(prev => prev + 1);
   };
   
-  const prevStep = () => {
-    setCurrentStep(prev => prev - 1);
-  };
-  
-  const onSubmit = (data: FormData) => {
-    setIsLoading(true);
-    // 🔌 BACKEND_HOOK: submitPost(data, selectedPlatforms, uploadedFiles)
-    console.log({
-      ...data,
-      platforms: selectedPlatforms,
-      files: uploadedFiles.map(file => file.name),
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Logic to submit post would go here
+    console.log('Submitting post:', { 
+      content: postContent, 
+      image: selectedImage, 
+      scheduleDate, 
+      scheduleTime, 
+      platforms 
     });
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      alert('Post scheduled successfully!');
-      // Redirect to calendar
-      window.location.href = '/calendar';
-    }, 1500);
+    // Display success message or redirect
   };
   
-  const getLongestCharacterLimit = () => {
-    if (selectedPlatforms.length === 0) return 5000;
-    
-    return Math.min(
-      ...selectedPlatforms.map(id => 
-        platforms.find(p => p.id === id)?.characterLimit || 5000
-      )
-    );
-  };
-  
-  const characterLimit = getLongestCharacterLimit();
-  const characterCount = content?.length || 0;
-  
-  const generateHashtags = () => {
-    // 🔌 BACKEND_HOOK: generateHashtags(content, uploadedFiles)
-    const mockHashtags = "#socialmedia #digitalmarketing #contentcreation #postsync";
-    
-    setValue('content', content + (content ? '\n\n' : '') + mockHashtags);
-  };
-  
-  const renderProgressBar = () => {
-    return (
-      <div className="w-full mb-8">
-        <div className="flex justify-between mb-2">
-          {[1, 2, 3].map((step) => (
-            <div 
-              key={step} 
-              className={`flex flex-col items-center ${step < currentStep ? 'text-postsync-primary' : step === currentStep ? 'text-postsync-text' : 'text-postsync-muted'}`}
-            >
-              <div 
-                className={`w-8 h-8 flex items-center justify-center rounded-full mb-1 
-                  ${step < currentStep ? 'bg-postsync-primary text-white' : 
-                    step === currentStep ? 'border-2 border-postsync-primary text-postsync-primary' : 
-                    'border-2 border-gray-200 text-postsync-muted'}`}
-              >
-                {step}
-              </div>
-              <span className="text-xs hidden sm:block">
-                {step === 1 ? 'Select Platforms' : step === 2 ? 'Compose' : 'Schedule'}
-              </span>
-            </div>
-          ))}
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Create New Post</h1>
+          <p className="text-muted-foreground">Craft and schedule your social media content</p>
         </div>
-        <div className="relative h-1 bg-gray-200 rounded-full">
-          <div 
-            className="absolute h-1 bg-postsync-primary rounded-full transition-all"
-            style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
-          ></div>
+        
+        <div className="flex gap-2 mt-4 md:mt-0">
+          <Button variant="outline" asChild>
+            <a href="/ai-captions">
+              Use AI Caption Generator
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </a>
+          </Button>
+          <Button>Save as Draft</Button>
         </div>
       </div>
-    );
-  };
-  
-  // Render step content based on current step
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold font-inter">Select Platforms</h2>
-            <p className="text-postsync-muted">Choose the social media platforms where you want to publish your content.</p>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mt-6">
-              {platforms.map((platform) => (
-                <div
-                  key={platform.id}
-                  onClick={() => togglePlatform(platform.id)}
-                  className={`p-4 rounded-lg border-2 transition-colors cursor-pointer flex flex-col items-center justify-center ${
-                    selectedPlatforms.includes(platform.id)
-                      ? `border-[${platform.color}] bg-[${platform.color}]/10`
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  style={{ 
-                    borderColor: selectedPlatforms.includes(platform.id) ? platform.color : undefined,
-                    backgroundColor: selectedPlatforms.includes(platform.id) ? `${platform.color}10` : undefined
-                  }}
-                >
-                  <div 
-                    className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
-                    style={{ color: platform.color }}
-                  >
-                    {platform.icon}
-                  </div>
-                  <span className="text-sm font-medium">{platform.name}</span>
-                </div>
-              ))}
-            </div>
-            
-            {selectedPlatforms.length === 0 && (
-              <p className="text-red-500 text-sm">Please select at least one platform</p>
-            )}
-          </div>
-        );
       
-      case 2:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold font-inter">Create Your Post</h2>
-            <p className="text-postsync-muted">Compose your content and add media files.</p>
-            
-            <div className="space-y-4 mt-6">
-              <div>
-                <Label htmlFor="content">Post content</Label>
-                <div className="mt-2">
-                  <Textarea
-                    id="content"
-                    placeholder="Write your post content here..."
-                    className="min-h-[150px]"
-                    {...register("content")}
-                  />
-                  <div className="flex justify-between mt-1 text-xs text-postsync-muted">
-                    <div>
-                      Character count: {characterCount} / {characterLimit}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={generateHashtags}
-                      className="text-xs"
-                    >
-                      Generate Hashtags
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Post Editor */}
+        <div className="lg:col-span-2">
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle>Content</CardTitle>
+              <CardDescription>Write your post content and add media</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                placeholder="What's on your mind? Write your post content here..."
+                className="min-h-[200px]"
+                value={postContent}
+                onChange={(e) => setPostContent(e.target.value)}
+              />
+              
+              <div className="border rounded-md p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium">Media</h3>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="text-xs">
+                      <Link className="h-3 w-3 mr-1" />
+                      Add URL
+                    </Button>
+                    <Button size="sm" variant="outline" className="text-xs">
+                      <Plus className="h-3 w-3 mr-1" />
+                      Create
                     </Button>
                   </div>
                 </div>
-              </div>
-              
-              {/* Media upload */}
-              <div>
-                <Label>Media</Label>
-                <div className="mt-2">
-                  {showFileUpload ? (
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8">
-                      <div className="flex flex-col items-center">
-                        <Upload className="h-12 w-12 text-gray-400 mb-4" />
-                        <p className="text-sm text-postsync-muted mb-2">
-                          Drag and drop files here, or click to browse
-                        </p>
-                        <input
-                          type="file"
-                          className="hidden"
-                          id="file-upload"
-                          multiple
-                          onChange={handleFileUpload}
-                        />
-                        <label htmlFor="file-upload">
-                          <Button type="button" variant="outline" size="sm">
-                            Browse Files
-                          </Button>
-                        </label>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {previewImage ? (
+                    <div className="relative group">
+                      <img 
+                        src={previewImage} 
+                        alt="Preview" 
+                        className="w-full h-auto rounded-md object-cover"
+                        style={{ maxHeight: '300px' }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                        <Button variant="destructive" size="sm" onClick={() => {
+                          setSelectedImage(null);
+                          setPreviewImage(null);
+                        }}>
+                          Remove
+                        </Button>
                       </div>
                     </div>
                   ) : (
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="w-full py-8" 
-                      onClick={() => setShowFileUpload(true)}
-                    >
-                      <Upload className="mr-2 h-4 w-4" /> Upload Media
-                    </Button>
+                    <div className="border-2 border-dashed rounded-md p-8 text-center">
+                      <ImageIcon className="h-8 w-8 mx-auto text-muted-foreground" />
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Drag and drop an image, or click to browse
+                      </p>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        id="image-upload"
+                        onChange={handleImageUpload}
+                      />
+                      <Button asChild variant="ghost" className="mt-4">
+                        <label htmlFor="image-upload" className="cursor-pointer">
+                          Upload Image
+                        </label>
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
-              
-              {/* Uploaded files preview */}
-              {uploadedFilesPreviews.length > 0 && (
-                <div>
-                  <Label>Uploaded files</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
-                    {uploadedFilesPreviews.map((file, index) => (
-                      <div key={index} className="relative group">
-                        <div className="aspect-square rounded-md overflow-hidden border border-gray-200">
-                          <img 
-                            src={file} 
-                            alt={`Upload ${index}`} 
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => removeFile(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              <div>
-                <Label>Selected platforms</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {selectedPlatforms.map(id => {
-                    const platform = platforms.find(p => p.id === id);
-                    return platform ? (
-                      <div 
-                        key={id}
-                        className="px-3 py-1 rounded-full flex items-center space-x-1 text-white text-sm"
-                        style={{ backgroundColor: platform.color }}
-                      >
-                        <span>{platform.icon}</span>
-                        <span>{platform.name}</span>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold font-inter">Schedule Your Post</h2>
-            <p className="text-postsync-muted">Choose when your content will be published.</p>
-            
-            <div className="space-y-6 mt-6">
-              {/* Date picker */}
-              <div>
-                <Label htmlFor="date">Publication Date</Label>
-                <div className="mt-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        id="date"
-                        variant={"outline"}
-                        className="w-full justify-start text-left"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, 'PPP') : <span>Pick a date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(date) => date && setValue('date', date)}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
+            </CardContent>
+          </Card>
+          
+          <Card className="mt-6 shadow-md">
+            <CardHeader>
+              <CardTitle>Customize for Each Platform</CardTitle>
+              <CardDescription>Tailor your content for different social media platforms</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="global">
+                <TabsList className="mb-4 grid w-full grid-cols-6">
+                  <TabsTrigger value="global">Global</TabsTrigger>
+                  <TabsTrigger value="instagram" disabled={!platforms.instagram}>Instagram</TabsTrigger>
+                  <TabsTrigger value="facebook" disabled={!platforms.facebook}>Facebook</TabsTrigger>
+                  <TabsTrigger value="twitter" disabled={!platforms.twitter}>Twitter</TabsTrigger>
+                  <TabsTrigger value="linkedin" disabled={!platforms.linkedin}>LinkedIn</TabsTrigger>
+                  <TabsTrigger value="youtube" disabled={!platforms.youtube}>YouTube</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="global">
+                  <p className="text-muted-foreground mb-4">
+                    This content will be used for all platforms. Customize individual platforms by selecting the tabs above.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="global-first-comment">First Comment</Label>
+                      <Textarea 
+                        id="global-first-comment"
+                        placeholder="Add a first comment (optional)"
+                        className="mt-1 h-20"
                       />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              
-              {/* Time picker */}
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="global-hashtags">Hashtags</Label>
+                      <Textarea 
+                        id="global-hashtags"
+                        placeholder="#socialmedia #marketing #content"
+                        className="mt-1 h-20"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                {/* Platform-specific tabs would be expanded here */}
+                <TabsContent value="instagram">
+                  <p className="text-muted-foreground mb-4">
+                    Customize your content specifically for Instagram.
+                  </p>
+                  {/* Instagram-specific options */}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Settings Panel */}
+        <div>
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle>Publish Settings</CardTitle>
+              <CardDescription>Configure when and where to publish your post</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Platform Selection */}
               <div>
-                <Label htmlFor="time">Publication Time</Label>
-                <div className="mt-2">
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-2.5 h-4 w-4 text-postsync-muted" />
-                    <Input
-                      id="time"
-                      type="time"
-                      className="pl-10"
-                      {...register("time", { required: "Time is required" })}
+                <h3 className="text-sm font-medium mb-3">Select Platforms</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Instagram className="h-5 w-5 text-[#E1306C]" />
+                      <Label htmlFor="instagram" className="text-sm">Instagram</Label>
+                    </div>
+                    <Switch 
+                      id="instagram" 
+                      checked={platforms.instagram}
+                      onCheckedChange={(checked) => setPlatforms({...platforms, instagram: checked})}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Facebook className="h-5 w-5 text-[#1877F2]" />
+                      <Label htmlFor="facebook" className="text-sm">Facebook</Label>
+                    </div>
+                    <Switch 
+                      id="facebook" 
+                      checked={platforms.facebook}
+                      onCheckedChange={(checked) => setPlatforms({...platforms, facebook: checked})}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Twitter className="h-5 w-5 text-[#1DA1F2]" />
+                      <Label htmlFor="twitter" className="text-sm">Twitter</Label>
+                    </div>
+                    <Switch 
+                      id="twitter" 
+                      checked={platforms.twitter}
+                      onCheckedChange={(checked) => setPlatforms({...platforms, twitter: checked})}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Linkedin className="h-5 w-5 text-[#0077B5]" />
+                      <Label htmlFor="linkedin" className="text-sm">LinkedIn</Label>
+                    </div>
+                    <Switch 
+                      id="linkedin" 
+                      checked={platforms.linkedin}
+                      onCheckedChange={(checked) => setPlatforms({...platforms, linkedin: checked})}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Youtube className="h-5 w-5 text-[#FF0000]" />
+                      <Label htmlFor="youtube" className="text-sm">YouTube</Label>
+                    </div>
+                    <Switch 
+                      id="youtube" 
+                      checked={platforms.youtube}
+                      onCheckedChange={(checked) => setPlatforms({...platforms, youtube: checked})}
                     />
                   </div>
                 </div>
               </div>
               
-              {/* Timezone */}
+              {/* Scheduling Options */}
               <div>
-                <Label htmlFor="timezone">Timezone</Label>
-                <div className="mt-2">
-                  <Select
-                    defaultValue={timezones[0].value}
-                    onValueChange={(value) => setValue('timezone', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select timezone" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timezones.map((tz) => (
-                        <SelectItem key={tz.value} value={tz.value}>
-                          {tz.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <h3 className="text-sm font-medium mb-3">Scheduling</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="schedule-date">Date</Label>
+                      <div className="flex mt-1">
+                        <Input
+                          id="schedule-date"
+                          type="date"
+                          value={scheduleDate}
+                          onChange={(e) => setScheduleDate(e.target.value)}
+                          className={cn(
+                            "rounded-l-md",
+                            !scheduleDate && "text-muted-foreground"
+                          )}
+                          placeholder="Select date"
+                        />
+                        <Button 
+                          variant="outline" 
+                          type="button"
+                          className="rounded-l-none border-l-0"
+                        >
+                          <CalendarIcon className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="schedule-time">Time</Label>
+                      <div className="flex mt-1">
+                        <Input
+                          id="schedule-time"
+                          type="time"
+                          value={scheduleTime}
+                          onChange={(e) => setScheduleTime(e.target.value)}
+                          className={cn(
+                            "rounded-l-md",
+                            !scheduleTime && "text-muted-foreground"
+                          )}
+                        />
+                        <Button 
+                          variant="outline" 
+                          type="button"
+                          className="rounded-l-none border-l-0"
+                        >
+                          <Clock className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="timezone">Timezone</Label>
+                    <Select defaultValue="utc">
+                      <SelectTrigger id="timezone">
+                        <SelectValue placeholder="Select timezone" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="utc">UTC (Coordinated Universal Time)</SelectItem>
+                        <SelectItem value="est">EST (Eastern Standard Time)</SelectItem>
+                        <SelectItem value="pst">PST (Pacific Standard Time)</SelectItem>
+                        <SelectItem value="gmt">GMT (Greenwich Mean Time)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
               
-              {/* Preview */}
+              {/* Advanced Options */}
               <div>
-                <Label>Post Preview</Label>
-                <Card className="mt-2">
-                  <CardContent className="p-4">
-                    {uploadedFilesPreviews.length > 0 && (
-                      <div className="mb-4 rounded-md overflow-hidden border border-gray-200">
-                        <img 
-                          src={uploadedFilesPreviews[0]} 
-                          alt="Preview" 
-                          className="w-full h-auto max-h-[200px] object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="text-sm">
-                      {content || <span className="text-postsync-muted italic">No content provided</span>}
+                <h3 className="text-sm font-medium mb-3">Advanced Options</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <Label htmlFor="auto-tagging" className="text-sm">Auto Hashtags</Label>
+                      <p className="text-xs text-muted-foreground">Automatically add relevant hashtags</p>
                     </div>
-                    <div className="mt-4 text-xs text-postsync-muted">
-                      Scheduled for: {date ? format(date, 'PPP') : 'Not set'} at {watch('time') || 'Not set'}
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {selectedPlatforms.map(id => {
-                        const platform = platforms.find(p => p.id === id);
-                        return platform ? (
-                          <div 
-                            key={id}
-                            className="w-6 h-6 rounded-full flex items-center justify-center"
-                            style={{ color: platform.color }}
-                          >
-                            {platform.icon}
-                          </div>
-                        ) : null;
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        );
-      
-      default:
-        return null;
-    }
-  };
-  
-  return (
-    <div className="min-h-screen pb-12 animate-fade-in">
-      <Container>
-        <div className="py-8">
-          <h1 className="text-2xl md:text-3xl font-bold font-inter mb-2">
-            Create New Post
-          </h1>
-          <p className="text-muted-foreground">
-            Create and schedule content for your social media platforms
-          </p>
-        </div>
-        
-        <div className="max-w-4xl mx-auto">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            {renderProgressBar()}
-            
-            <Card className="shadow-card dark:bg-card">
-              <CardContent className="p-6">
-                {renderStepContent()}
-                
-                <div className="flex justify-between mt-8">
-                  {currentStep > 1 ? (
-                    <Button type="button" variant="outline" onClick={prevStep}>
-                      Back
-                    </Button>
-                  ) : (
-                    <div></div>
-                  )}
+                    <Switch id="auto-tagging" />
+                  </div>
                   
-                  {currentStep < 3 ? (
-                    <Button type="button" onClick={nextStep}>
-                      Continue
-                    </Button>
-                  ) : (
-                    <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90">
-                      {isLoading ? 'Scheduling...' : 'Schedule Post'}
-                    </Button>
-                  )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <Label htmlFor="optimize-time" className="text-sm">Best Time to Post</Label>
+                      <p className="text-xs text-muted-foreground">Optimize posting time for engagement</p>
+                    </div>
+                    <Switch id="optimize-time" />
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </form>
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-4">
+              <Button 
+                className="w-full bg-postsync-primary hover:bg-postsync-secondary"
+                onClick={handleSubmit}
+              >
+                Schedule Post
+              </Button>
+              <Button variant="outline" className="w-full">
+                Post Now
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
-      </Container>
+      </div>
     </div>
   );
 };
 
-export default CreatePost;
+export default CreatePostPage;

@@ -20,11 +20,11 @@ export default {
     },
     extend: {
       colors: {
-        // Postsync custom colors - updated for modern look
+        // Postsync custom colors - updated for modern look with purple/pink
         postsync: {
-          primary: "#4CAF50",
-          secondary: "#2E7D32",
-          accent: "#81C784",
+          primary: "#8B5CF6",
+          secondary: "#7E69AB",
+          accent: "#D946EF",
           background: "#F9FAFB",
           backgroundAlt: "#F1F5F9",
           text: "#111827",

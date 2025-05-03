@@ -6,7 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
-import Navbar from "@/components/layout/Navbar";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
 import LandingPage from "./pages/Landing";
 import Login from "./pages/Auth/Login";
@@ -23,10 +24,9 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Layout wrapper to apply Navbar and Footer to protected routes
-  const Layout = ({ children }: { children: React.ReactNode }) => (
+  // Layout wrapper for public pages
+  const PublicLayout = ({ children }: { children: React.ReactNode }) => (
     <>
-      <Navbar />
       {children}
       <Footer />
     </>
@@ -35,31 +35,35 @@ const App = () => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AuthProvider>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Layout><LandingPage /></Layout>} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                
-                {/* Protected routes */}
-                <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-                <Route path="/analytics" element={<Layout><Analytics /></Layout>} />
-                <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
-                <Route path="/create" element={<Layout><CreatePost /></Layout>} />
-                <Route path="/ai-captions" element={<Layout><AICaptions /></Layout>} />
-                <Route path="/settings" element={<Layout><Settings /></Layout>} />
-                
-                {/* 404 page */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AuthProvider>
-          </BrowserRouter>
-        </TooltipProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AuthProvider>
+                <Sidebar>
+                  <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    
+                    {/* Protected routes */}
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/calendar" element={<Calendar />} />
+                    <Route path="/create" element={<CreatePost />} />
+                    <Route path="/ai-captions" element={<AICaptions />} />
+                    <Route path="/settings" element={<Settings />} />
+                    
+                    {/* 404 page */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Sidebar>
+              </AuthProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </React.StrictMode>
   );

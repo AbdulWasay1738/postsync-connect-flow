@@ -121,43 +121,43 @@ const ContentCalendar = () => {
     setSelectedEvent(event);
     setOpen(true);
   };
-  
-  // Custom day cell content renderer with event indicators
-  const renderDayContent = (day: Date) => {
-    const events = mockEvents.filter(event => isSameDay(event.date, day));
-    
-    if (events.length === 0) return null;
-    
-    return (
-      <div className="flex justify-center mt-1 space-x-0.5">
-        {events.slice(0, 3).map((event, i) => (
-          <div
-            key={i}
-            className="h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: getPlatformColor(event.platform) }}
-          />
-        ))}
-        {events.length > 3 && (
-          <div className="h-1.5 w-1.5 rounded-full bg-gray-300" />
-        )}
-      </div>
-    );
+
+  // Modified day cell render function for the Calendar
+  const modifiers = {
+    eventDay: (day: Date) => mockEvents.some(event => isSameDay(event.date, day)),
+  };
+
+  const modifiersStyles = {
+    eventDay: {
+      position: "relative",
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        bottom: "3px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "4px",
+        height: "4px",
+        borderRadius: "50%",
+        backgroundColor: "var(--primary)",
+      }
+    }
   };
   
   return (
-    <div className="min-h-screen pb-12">
+    <div className="min-h-screen pb-12 animate-fade-in">
       <Container>
         <div className="py-8">
           <h1 className="text-2xl md:text-3xl font-bold font-inter mb-2">
             Content Calendar
           </h1>
-          <p className="text-postsync-muted">
+          <p className="text-muted-foreground">
             Plan and schedule your social media content
           </p>
         </div>
         
         <div className="flex flex-col md:flex-row gap-4">
-          <Card className="w-full md:w-1/3">
+          <Card className="w-full md:w-1/3 shadow-card dark:bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Calendar
@@ -170,6 +170,8 @@ const ContentCalendar = () => {
                 onSelect={setDate}
                 initialFocus
                 className="p-0 pointer-events-auto"
+                modifiers={modifiers}
+                modifiersStyles={modifiersStyles}
               />
               
               <div className="absolute top-2 right-2 flex items-center space-x-2">
@@ -193,7 +195,7 @@ const ContentCalendar = () => {
             </CardContent>
           </Card>
           
-          <Card className="w-full md:w-2/3">
+          <Card className="w-full md:w-2/3 shadow-card dark:bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Scheduled Content
@@ -212,14 +214,14 @@ const ContentCalendar = () => {
                 .map(event => (
                   <div 
                     key={event.id}
-                    className="py-2 px-3 rounded-md hover:bg-gray-100 transition-colors cursor-pointer flex items-center justify-between"
+                    className="py-2 px-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer flex items-center justify-between"
                     onClick={() => handleEventClick(event)}
                   >
                     <div className="flex items-center">
                       {getPlatformIcon(event.platform)}
                       <span className="ml-2 text-sm">{format(event.date, 'h:mm a')}</span>
                     </div>
-                    <div className="text-xs text-postsync-muted">
+                    <div className="text-xs text-muted-foreground">
                       {event.content.substring(0, 30)}
                       {event.content.length > 30 && '...'}
                     </div>
@@ -253,7 +255,7 @@ const ContentCalendar = () => {
                   </div>
                 </>
               ) : (
-                <div className="text-sm text-postsync-muted">No event selected</div>
+                <div className="text-sm text-muted-foreground">No event selected</div>
               )}
             </div>
           </SheetContent>

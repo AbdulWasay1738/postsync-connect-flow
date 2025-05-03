@@ -479,13 +479,13 @@ const CreatePost = () => {
   };
   
   return (
-    <div className="min-h-screen pb-12">
+    <div className="min-h-screen pb-12 animate-fade-in">
       <Container>
         <div className="py-8">
           <h1 className="text-2xl md:text-3xl font-bold font-inter mb-2">
             Create New Post
           </h1>
-          <p className="text-postsync-muted">
+          <p className="text-muted-foreground">
             Create and schedule content for your social media platforms
           </p>
         </div>
@@ -494,7 +494,7 @@ const CreatePost = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             {renderProgressBar()}
             
-            <Card>
+            <Card className="shadow-card dark:bg-card">
               <CardContent className="p-6">
                 {renderStepContent()}
                 
@@ -512,7 +512,7 @@ const CreatePost = () => {
                       Continue
                     </Button>
                   ) : (
-                    <Button type="submit" disabled={isLoading} className="bg-postsync-primary hover:bg-blue-700">
+                    <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90">
                       {isLoading ? 'Scheduling...' : 'Schedule Post'}
                     </Button>
                   )}

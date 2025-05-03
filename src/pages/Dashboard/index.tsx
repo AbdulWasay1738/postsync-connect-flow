@@ -1,12 +1,12 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format, subDays } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Instagram, Facebook, Linkedin, Twitter, Youtube, Users, ThumbsUp, MessageSquare, Share2, CalendarDays, ChevronRight, BarChart3, Sparkles, PlusCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Instagram, Facebook, Linkedin, Twitter, Youtube, Users, ThumbsUp, MessageSquare, Share2, BarChart3, Sparkles, PlusCircle, TrendingUp, TrendingDown, Eye } from 'lucide-react';
 import { LineChart, Line, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Container from '@/components/ui/Container';
 
 // Mock data for recent activities
@@ -18,13 +18,13 @@ const recentActivities = [
   { id: 5, platform: 'youtube', type: 'view', count: 542, date: subDays(new Date(), 3) },
 ];
 
-// Mock data for audience insights
-const audienceInsights = [
-  { id: 1, platform: 'instagram', count: 4589, change: 12 },
-  { id: 2, platform: 'facebook', count: 7823, change: -5 },
-  { id: 3, platform: 'linkedin', count: 2345, change: 8 },
-  { id: 4, platform: 'twitter', count: 6102, change: 3 },
-  { id: 5, platform: 'youtube', count: 9210, change: 15 },
+// Enhanced platform insights with multiple metrics
+const platformInsights = [
+  { id: 1, platform: 'instagram', followers: 4589, engagement: 3.2, reach: 12500, growth: 12, views: 8700 },
+  { id: 2, platform: 'facebook', followers: 7823, engagement: 2.1, reach: 18300, growth: -5, views: 15200 },
+  { id: 3, platform: 'linkedin', followers: 2345, engagement: 4.8, reach: 8900, growth: 8, views: 6300 },
+  { id: 4, platform: 'twitter', followers: 6102, engagement: 5.3, reach: 22100, growth: 3, views: 19800 },
+  { id: 5, platform: 'youtube', followers: 9210, engagement: 4.1, reach: 31200, growth: 15, views: 29500 },
 ];
 
 // Mock data for engagement rates
@@ -38,30 +38,18 @@ const engagementRates = [
   { date: new Date(), instagram: 5.0, facebook: 3.0, linkedin: 3.7, twitter: 5.3, youtube: 4.1 },
 ];
 
-// Mock data for website traffic
-const websiteTraffic = [
-  { date: subDays(new Date(), 6), desktop: 450, mobile: 320, tablet: 180 },
-  { date: subDays(new Date(), 5), desktop: 480, mobile: 340, tablet: 190 },
-  { date: subDays(new Date(), 4), desktop: 510, mobile: 360, tablet: 200 },
-  { date: subDays(new Date(), 3), desktop: 540, mobile: 380, tablet: 210 },
-  { date: subDays(new Date(), 2), desktop: 570, mobile: 400, tablet: 220 },
-  { date: subDays(new Date(), 1), desktop: 600, mobile: 420, tablet: 230 },
-  { date: new Date(), desktop: 630, mobile: 440, tablet: 240 },
-];
-
-// Social platforms data
+// Social platforms data with updated colors and branding
 const platforms = [
-  { id: 'instagram', name: 'Instagram', icon: <Instagram />, color: '#E1306C' },
-  { id: 'facebook', name: 'Facebook', icon: <Facebook />, color: '#4267B2' },
-  { id: 'linkedin', name: 'LinkedIn', icon: <Linkedin />, color: '#0077B5' },
-  { id: 'twitter', name: 'Twitter', icon: <Twitter />, color: '#1DA1F2' },
-  { id: 'pinterest', name: 'Pinterest', icon: <Twitter />, color: '#E60023' }, // Using Twitter as replacement
-  { id: 'youtube', name: 'YouTube', icon: <Youtube />, color: '#FF0000' },
+  { id: 'instagram', name: 'Instagram', icon: <Instagram />, color: '#E1306C', logo: '/instagram-logo.png' },
+  { id: 'facebook', name: 'Facebook', icon: <Facebook />, color: '#4267B2', logo: '/facebook-logo.png' },
+  { id: 'linkedin', name: 'LinkedIn', icon: <Linkedin />, color: '#0077B5', logo: '/linkedin-logo.png' },
+  { id: 'twitter', name: 'Twitter', icon: <Twitter />, color: '#1DA1F2', logo: '/twitter-logo.png' },
+  { id: 'youtube', name: 'YouTube', icon: <Youtube />, color: '#FF0000', logo: '/youtube-logo.png' },
 ];
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [isActivitiesOpen, setIsActivitiesOpen] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState('followers');
 
   // Function to get greeting based on the time of day
   const getGreeting = () => {
@@ -75,14 +63,26 @@ const Dashboard = () => {
     }
   };
 
+  // Get metric icon based on type
+  const getMetricIcon = (metric: string) => {
+    switch(metric) {
+      case 'followers': return <Users className="h-5 w-5" />;
+      case 'engagement': return <ThumbsUp className="h-5 w-5" />;
+      case 'reach': return <Eye className="h-5 w-5" />;
+      case 'growth': return <TrendingUp className="h-5 w-5" />;
+      case 'views': return <BarChart3 className="h-5 w-5" />;
+      default: return <Users className="h-5 w-5" />;
+    }
+  };
+
   return (
-    <div className="min-h-screen pb-12">
+    <div className="min-h-screen pb-12 animate-fade-in">
       <Container>
         <div className="py-8">
           <h1 className="text-2xl md:text-3xl font-bold font-inter mb-2">
             {getGreeting()}, Welcome back!
           </h1>
-          <p className="text-postsync-muted">
+          <p className="text-muted-foreground">
             Here's a snapshot of your social media performance.
           </p>
         </div>
@@ -90,47 +90,93 @@ const Dashboard = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="content">Content</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Audience Insights */}
-              {audienceInsights.map(platform => (
-                <Card key={platform.id}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      {platforms.find(p => p.id === platform.platform)?.icon}
-                      <span>{platforms.find(p => p.id === platform.platform)?.name}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-semibold">{platform.count}</div>
-                    <div className="text-sm text-postsync-muted">
-                      {platform.change > 0 ? (
-                        <span className="text-green-500">+ {platform.change}%</span>
-                      ) : (
-                        <span className="text-red-500">- {Math.abs(platform.change)}%</span>
-                      )}
-                      <span> from last month</span>
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Metric Selector */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {['followers', 'engagement', 'reach', 'growth', 'views'].map((metric) => (
+                <Button 
+                  key={metric} 
+                  variant={selectedMetric === metric ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedMetric(metric)}
+                  className="flex items-center gap-2"
+                >
+                  {getMetricIcon(metric)}
+                  <span className="capitalize">{metric}</span>
+                </Button>
               ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Platform Cards */}
+              {platformInsights.map(platform => {
+                // Select the current metric to display
+                let metricValue = platform[selectedMetric as keyof typeof platform];
+                let metricLabel = selectedMetric;
+                let metricIcon = getMetricIcon(selectedMetric);
+                let metricFormat = '';
+                
+                if (selectedMetric === 'engagement') {
+                  metricFormat = '%';
+                } else if (selectedMetric === 'growth') {
+                  metricFormat = '%';
+                }
+
+                return (
+                  <Card key={platform.id} className="shadow-card hover:shadow-hover transition-shadow dark:bg-card">
+                    <Link to={`/analytics?platform=${platform.platform}`}>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            {platforms.find(p => p.id === platform.platform)?.icon}
+                            <CardTitle className="text-base">{platforms.find(p => p.id === platform.platform)?.name}</CardTitle>
+                          </div>
+                          {metricIcon}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-semibold">
+                          {metricValue}{metricFormat}
+                        </div>
+                        <div className="text-sm text-muted-foreground capitalize">
+                          {platform.growth > 0 ? (
+                            <span className="flex items-center text-green-500">
+                              <TrendingUp className="mr-1 h-4 w-4" /> {platform.growth}%
+                            </span>
+                          ) : (
+                            <span className="flex items-center text-red-500">
+                              <TrendingDown className="mr-1 h-4 w-4" /> {Math.abs(platform.growth)}%
+                            </span>
+                          )}
+                          <span> from last month</span>
+                        </div>
+                      </CardContent>
+                    </Link>
+                  </Card>
+                );
+              })}
             </div>
             
             {/* Engagement Rates Chart */}
-            <Card>
+            <Card className="shadow-card dark:bg-card">
               <CardHeader>
                 <CardTitle>Engagement Rates</CardTitle>
+                <CardDescription>Track engagement across all platforms</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={engagementRates} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" tickFormatter={(date) => format(date, 'MMM d')} />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis 
+                      dataKey="date" 
+                      tickFormatter={(date) => format(date, 'MMM d')} 
+                      stroke="var(--muted-foreground)"
+                    />
+                    <YAxis stroke="var(--muted-foreground)" />
                     <Tooltip />
                     <Legend />
                     <Line type="monotone" dataKey="instagram" stroke="#E1306C" name="Instagram" />
@@ -142,63 +188,116 @@ const Dashboard = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-card hover:shadow-hover transition-shadow">
+                <Link to="/create">
+                  <CardContent className="flex flex-col items-center justify-center h-32">
+                    <PlusCircle className="h-10 w-10 mb-2" />
+                    <h3 className="font-medium text-lg">Create Post</h3>
+                  </CardContent>
+                </Link>
+              </Card>
+              <Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-card hover:shadow-hover transition-shadow">
+                <Link to="/ai-captions">
+                  <CardContent className="flex flex-col items-center justify-center h-32">
+                    <Sparkles className="h-10 w-10 mb-2" />
+                    <h3 className="font-medium text-lg">AI Captions</h3>
+                  </CardContent>
+                </Link>
+              </Card>
+              <Card className="bg-gradient-to-br from-green-500 to-teal-500 text-white shadow-card hover:shadow-hover transition-shadow">
+                <Link to="/calendar">
+                  <CardContent className="flex flex-col items-center justify-center h-32">
+                    <PlusCircle className="h-10 w-10 mb-2" />
+                    <h3 className="font-medium text-lg">Schedule Post</h3>
+                  </CardContent>
+                </Link>
+              </Card>
+              <Card className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white shadow-card hover:shadow-hover transition-shadow">
+                <Link to="/analytics">
+                  <CardContent className="flex flex-col items-center justify-center h-32">
+                    <BarChart3 className="h-10 w-10 mb-2" />
+                    <h3 className="font-medium text-lg">Analytics</h3>
+                  </CardContent>
+                </Link>
+              </Card>
+            </div>
           </TabsContent>
           
-          <TabsContent value="analytics">
-            Analytics content goes here.
+          <TabsContent value="insights">
+            <Card className="shadow-card dark:bg-card">
+              <CardHeader>
+                <CardTitle>Platform Insights</CardTitle>
+                <CardDescription>Detailed analytics for each platform</CardDescription>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {platformInsights.map(platform => (
+                  <Card key={platform.id} className="shadow-sm dark:bg-card/80">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-2">
+                        {platforms.find(p => p.id === platform.platform)?.icon}
+                        <CardTitle className="text-base">{platforms.find(p => p.id === platform.platform)?.name}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Followers</span>
+                        <span className="font-medium">{platform.followers.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Engagement Rate</span>
+                        <span className="font-medium">{platform.engagement}%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Reach</span>
+                        <span className="font-medium">{platform.reach.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Views</span>
+                        <span className="font-medium">{platform.views.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Growth</span>
+                        <span className={`font-medium ${platform.growth > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {platform.growth > 0 ? '+' : ''}{platform.growth}%
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CardContent>
+            </Card>
           </TabsContent>
           
-          <TabsContent value="calendar">
-            Calendar content goes here.
+          <TabsContent value="content">
+            <Card className="shadow-card dark:bg-card">
+              <CardHeader>
+                <CardTitle>Recent Content Performance</CardTitle>
+                <CardDescription>How your recent posts are performing</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentActivities.map(activity => (
+                    <div key={activity.id} className="flex items-center justify-between p-3 rounded-md border">
+                      <div className="flex items-center gap-3">
+                        {platforms.find(p => p.id === activity.platform)?.icon}
+                        <div>
+                          <p className="font-medium">{activity.count} {activity.type}s</p>
+                          <p className="text-sm text-muted-foreground">{format(activity.date, 'MMM d, yyyy')}</p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        View Details
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
-        
-        {/* Quick Actions Sidebar */}
-        <div className="hidden lg:block fixed right-4 top-24 w-64 bg-white rounded-lg shadow-sm border p-4">
-          <h3 className="text-lg font-medium mb-4">Quick Actions</h3>
-          <div className="space-y-2">
-            <Link to="/create" className="flex items-center p-2 hover:bg-gray-50 rounded-md transition-colors">
-              <PlusCircle className="mr-2 text-postsync-primary" size={18} />
-              Create New Post
-            </Link>
-            <Link to="/ai-captions" className="flex items-center p-2 hover:bg-gray-50 rounded-md transition-colors">
-              <Sparkles className="mr-2 text-postsync-secondary" size={18} />
-              Generate AI Caption
-            </Link>
-            <Link to="/calendar" className="flex items-center p-2 hover:bg-gray-50 rounded-md transition-colors">
-              <CalendarDays className="mr-2 text-green-500" size={18} />
-              View Calendar
-            </Link>
-            <Link to="/analytics" className="flex items-center p-2 hover:bg-gray-50 rounded-md transition-colors">
-              <BarChart3 className="mr-2 text-purple-500" size={18} />
-              View Analytics
-            </Link>
-          </div>
-          
-          {/* Recent Activities */}
-          <div className="mt-6">
-            <Collapsible open={isActivitiesOpen} onOpenChange={setIsActivitiesOpen}>
-              <CollapsibleTrigger className="w-full flex items-center justify-between py-2">
-                <h4 className="text-sm font-medium">Recent Activities</h4>
-                <ChevronRight className={`h-4 w-4 transition-transform ${isActivitiesOpen ? 'rotate-90' : ''}`} />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pl-2 space-y-1">
-                {recentActivities.map(activity => (
-                  <div key={activity.id} className="flex items-center space-x-2 text-xs">
-                    {platforms.find(p => p.id === activity.platform)?.icon}
-                    <span>{activity.count} {activity.type} on {platforms.find(p => p.id === activity.platform)?.name}</span>
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-          
-          <div className="mt-6">
-            <Link to="/settings" className="text-xs text-postsync-muted hover:underline flex items-center justify-end">
-              <ChevronRight size={14} className="mr-1" /> Go to Settings
-            </Link>
-          </div>
-        </div>
       </Container>
     </div>
   );

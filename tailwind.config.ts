@@ -20,13 +20,13 @@ export default {
     },
     extend: {
       colors: {
-        // Postsync custom colors
+        // Postsync custom colors - updated for modern look
         postsync: {
-          background: "#FFFFFF",
-          backgroundAlt: "#FAFAF7",
-          primary: "#1A73E8",
-          secondary: "#FF6B6B",
-          text: "#111111",
+          background: "#F9FAFB",
+          backgroundAlt: "#F1F5F9",
+          primary: "#3B82F6",
+          secondary: "#EC4899",
+          text: "#111827",
           muted: "#6B7280",
         },
         border: "hsl(var(--border))",
@@ -82,6 +82,11 @@ export default {
         inter: ["'Inter'", "sans-serif"],
         ibm: ["'IBM Plex Sans'", "sans-serif"],
       },
+      boxShadow: {
+        'soft': '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05)',
+        'hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -91,10 +96,20 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" }
+        },
+        "slide-in": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "slide-in": "slide-in 0.4s ease-out",
       },
     },
   },

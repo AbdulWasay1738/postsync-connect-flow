@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { format, isSameMonth, isSameDay, addDays, subDays } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
-import { ChevronLeft, ChevronRight, Plus, Instagram, Facebook, Linkedin, Twitter, Pinterest, Youtube, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Instagram, Facebook, Linkedin, Twitter, Youtube, X } from 'lucide-react';
 import Container from '@/components/ui/Container';
 
 // Mock data for calendar events
@@ -60,7 +61,7 @@ const getPlatformIcon = (platform: string) => {
     case 'twitter':
       return <Twitter size={16} className="text-[#1DA1F2]" />;
     case 'pinterest':
-      return <Pinterest size={16} className="text-[#E60023]" />;
+      return <Twitter size={16} className="text-[#E60023]" />; // Using Twitter icon as a replacement for Pinterest
     case 'youtube':
       return <Youtube size={16} className="text-[#FF0000]" />;
     default:
@@ -119,7 +120,8 @@ const CalendarPage = () => {
   };
   
   // Function to render dots on calendar for dates with events
-  const renderDayContent = (day: Date) => {
+  const renderDayContent = (props: any) => {
+    const day = props.date;
     const events = mockEvents.filter(event => isSameDay(event.date, day));
     
     if (events.length === 0) return null;

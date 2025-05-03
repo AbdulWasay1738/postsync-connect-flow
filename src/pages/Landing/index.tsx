@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Container from '@/components/ui/Container';
-import { ArrowRight, CheckCircle, Instagram, Facebook, Linkedin, Twitter, Pinterest, Youtube } from 'lucide-react';
+import { ArrowRight, CheckCircle, Instagram, Facebook, Linkedin, Twitter, Youtube } from 'lucide-react';
 
 // Mock data for features and testimonials
 const features = [
@@ -65,7 +65,7 @@ const platforms = [
   { name: "Facebook", icon: <Facebook className="h-6 w-6" /> },
   { name: "LinkedIn", icon: <Linkedin className="h-6 w-6" /> },
   { name: "Twitter", icon: <Twitter className="h-6 w-6" /> },
-  { name: "Pinterest", icon: <Pinterest className="h-6 w-6" /> },
+  { name: "Pinterest", icon: <Twitter className="h-6 w-6" /> }, // Using Twitter icon as a replacement for Pinterest
   { name: "YouTube", icon: <Youtube className="h-6 w-6" /> },
 ];
 

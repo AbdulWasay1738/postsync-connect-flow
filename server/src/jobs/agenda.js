@@ -1,27 +1,35 @@
-const Agenda   = require('agenda');
-const Post     = require('../models/Post');
-const { publishToPlatforms } = require('../services/social');  // wrapper around your existing create‑post code
+// server/src/jobs/agenda.js
+const Agenda = require('agenda');
+const mongoose = require('mongoose');
 
-const agenda = new Agenda({ db: { address: process.env.MONGO_URI, collection: 'jobs' } });
+// Reuse the mongoose connection DB
+const agenda = new Agenda({ mongo: mongoose.connection.db });
 
-agenda.define('publish scheduled post', async (job) => {
-  const { postId } = job.attrs.data;
-  const post = await Post.findById(postId);
-  if (!post || post.status !== 'approved') return;
+// 1️⃣ Define the job
+agenda.define('enqueue due posts', async job => {
+  const ScheduledPost = mongoose.model('ScheduledPost');  // or require your model directly
+  const now = new Date();
 
-  try {
-    await publishToPlatforms(post);          // ← call your existing service
-    post.status = 'posted';
-    await post.save();
-  } catch (err) {
-    console.error(err);
-    post.status = 'failed';
-    await post.save();
+  // find all pending posts that are due
+  const due = await ScheduledPost.find({
+    scheduledAt: { $lte: now },
+    status: 'pending',
+  });
+
+  for (let post of due) {
+    try {
+      // TODO: call your posting function here, e.g. ayrshare.post(…)
+      await sendToSocialNetwork(post);
+
+      // mark it done
+      post.status = 'posted';
+      await post.save();
+    } catch (err) {
+      console.error('Failed to post', post._id, err);
+      // optionally update post.status = 'error'
+    }
   }
 });
 
-const schedulePostJob = async (post) => {
-  await agenda.schedule(post.scheduledAt, 'publish scheduled post', { postId: post._id });
-};
-
-module.exports = { agenda, schedulePostJob };
+// 2️⃣ Export your agenda instance
+module.exports = agenda;

@@ -6,32 +6,43 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-interface LoginFormData {
+interface SignupFormData {
+  name: string;
   email: string;
   password: string;
-  rememberMe: boolean;
+  confirmPassword: string;
+  agreeToTerms: boolean;
 }
 
-const Login = () => {
-  const { isAuthenticated, login } = useAuth();
+const Signup = () => {
+  const { isAuthenticated, signup } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const authContext = useAuth();
   
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<SignupFormData>();
+  const password = watch('password', '');
   
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: SignupFormData) => {
+    if (data.password !== data.confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
+  
     try {
       setError(null);
       setIsLoading(true);
-      await login(data.email, data.password);
-    } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      await signup(data.name, data.email, data.password); // ← calls backend
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+  
   
   if (isAuthenticated) {
     return <Navigate to="/dashboard" />;
@@ -42,14 +53,14 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Link to="/" className="flex items-center">
-            <img src="/logo.svg" alt="Postsync Logo" className="h-16" />
+            <img src="/lovable-uploads/3a811bac-42bd-406d-b2d9-32f2ab53de2c.png" alt="Postsync Logo" className="h-16" />
           </Link>
         </div>
         
         <Card className="border-border/50 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold font-inter">Log in to Postsync</CardTitle>
-            <CardDescription>Enter your email and password to access your account</CardDescription>
+            <CardTitle className="text-2xl font-bold font-inter">Create an account</CardTitle>
+            <CardDescription>Sign up for your Postsync account</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -58,6 +69,22 @@ const Login = () => {
                   {error}
                 </div>
               )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="name">Full name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Smith"
+                  {...register("name", { 
+                    required: "Name is required" 
+                  })}
+                  className={errors.name ? "border-red-300" : ""}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name.message}</p>
+                )}
+              </div>
               
               <div className="space-y-2">
                 <Label htmlFor="email">Email address</Label>
@@ -80,12 +107,7 @@ const Login = () => {
               </div>
               
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link to="/forgot-password" className="text-sm text-postsync-primary hover:underline">
-                    Forgot password?
-                  </Link>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -93,8 +115,8 @@ const Login = () => {
                   {...register("password", { 
                     required: "Password is required", 
                     minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters"
+                      value: 8,
+                      message: "Password must be at least 8 characters"
                     }
                   })}
                   className={errors.password ? "border-red-300" : ""}
@@ -104,20 +126,40 @@ const Login = () => {
                 )}
               </div>
               
-              <div className="flex items-center gap-2">
-                <input 
-                  type="checkbox" 
-                  id="rememberMe"
-                  {...register("rememberMe")}
-                  className="h-4 w-4 rounded border-gray-300 text-postsync-primary focus:ring-postsync-primary" 
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  {...register("confirmPassword", { 
+                    required: "Please confirm your password",
+                    validate: value => value === password || "Passwords don't match"
+                  })}
+                  className={errors.confirmPassword ? "border-red-300" : ""}
                 />
-                <Label htmlFor="rememberMe" className="text-sm text-postsync-muted">
-                  Remember me for 30 days
-                </Label>
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+                )}
               </div>
               
+              <div className="flex items-start gap-2">
+                <input 
+                  type="checkbox" 
+                  id="agreeToTerms"
+                  {...register("agreeToTerms", { required: true })}
+                  className="h-4 w-4 mt-1 rounded border-gray-300 text-postsync-primary focus:ring-postsync-primary" 
+                />
+                <Label htmlFor="agreeToTerms" className="text-sm text-postsync-muted">
+                  I agree to the <Link to="/terms" className="text-postsync-primary hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-postsync-primary hover:underline">Privacy Policy</Link>
+                </Label>
+              </div>
+              {errors.agreeToTerms && (
+                <p className="text-red-500 text-sm">You must agree to the terms</p>
+              )}
+              
               <Button type="submit" className="w-full bg-postsync-primary hover:bg-postsync-secondary transition-colors" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Log in'}
+                {isLoading ? 'Creating account...' : 'Create account'}
               </Button>
               
               <div className="relative">
@@ -143,9 +185,9 @@ const Login = () => {
           </CardContent>
           <CardFooter className="flex justify-center">
             <p className="text-sm text-postsync-muted">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-postsync-primary font-medium hover:underline">
-                Sign up
+              Already have an account?{" "}
+              <Link to="/login" className="text-postsync-primary font-medium hover:underline">
+                Log in
               </Link>
             </p>
           </CardFooter>
@@ -161,4 +203,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

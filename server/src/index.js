@@ -1,14 +1,29 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
+// server/src/index.js
 
-dotenv.config();
+// 1️⃣ Load .env before anything else
+require('dotenv').config();
+
+const path    = require('path');
+const express = require('express');
+const cors    = require('cors');
+
+const connectDB    = require('./config/db');
+const authRoutes   = require('./routes/authRoutes');
+const postRoutes   = require('./routes/postRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+
+// 2️⃣ Connect to MongoDB
 connectDB();
 
 const app = express();
 
+// 3️⃣ Serve uploads folder at /uploads
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'uploads'))
+);
+
+// 4️⃣ Common middleware
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
@@ -17,13 +32,16 @@ app.use(
 );
 app.use(express.json());
 
-app.use('/api/auth', authRoutes);
+// 5️⃣ API routes
+app.use('/api/auth',        authRoutes);
+app.use('/api/post',        postRoutes);
+app.use('/api/uploadImage', uploadRoutes);
 
 app.get('/', (_, res) =>
   res.send('Postsync API is running 👍')
 );
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 49152;
 app.listen(PORT, () =>
-  console.log(`🚀  Server listening on http://localhost:${PORT}`)
+  console.log(`🚀 Server listening on http://localhost:${PORT}`)
 );

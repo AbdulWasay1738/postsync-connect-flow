@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  User
+  User,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -45,6 +46,7 @@ const Sidebar = ({ children }: SidebarProps) => {
     { title: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
     { title: 'Create Post', path: '/create', icon: <PlusCircle size={20} /> },
     { title: 'AI Captions', path: '/ai-captions', icon: <Sparkles size={20} /> },
+    { title: 'Competitor Analysis', path: '/competitor-analysis', icon: <Users size={20} /> },
     { title: 'Settings', path: '/settings', icon: <Settings size={20} /> },
   ] : [];
 

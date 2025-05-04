@@ -19,6 +19,7 @@ import CreatePost from "./pages/CreatePost";
 import AICaptions from "./pages/AICaptions";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import CompetitorAnalysis from '@/pages/CompetitorAnalysis';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -61,6 +62,7 @@ const App = () => {
                   <Route path="/create" element={<CreatePost />} />
                   <Route path="/ai-captions" element={<AICaptions />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/competitor-analysis" element={<CompetitorAnalysis />} />
                   
                   {/* 404 page */}
                   <Route path="*" element={<NotFound />} />

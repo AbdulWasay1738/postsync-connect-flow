@@ -90,3 +90,89 @@ export async function generateCaption(
   }
   return res.json();
 }
+
+
+// src/services/api.ts
+
+export interface CompetitorInfoResponse {
+  data: {
+    user: {
+      full_name: string;
+      username: string;
+      biography: string;
+      profile_pic_url: string;
+      external_url: string | null;
+      follower_count: number;
+      following_count: number;
+      media_count: number;
+      is_verified: boolean;
+      // … any other fields you want to type
+    };
+  };
+}
+
+// hard-coded RapidAPI credentials:
+const RAPIDAPI_HOST = 'instagram-scraper-ai1.p.rapidapi.com';
+const RAPIDAPI_KEY  = 'd3de603ec2msh2997cef1c9f512bp1cd1a7jsn0875fb2f085f';
+
+export async function getCompetitorInfo(
+  username: string
+): Promise<CompetitorInfoResponse> {
+  const url = `https://${RAPIDAPI_HOST}/user/info_v2/?username=${encodeURIComponent(
+    username
+  )}`;
+
+  const res = await fetch(url, {
+    headers: {
+      'x-rapidapi-host': RAPIDAPI_HOST,
+      'x-rapidapi-key':  RAPIDAPI_KEY,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`RapidAPI error: ${res.status} ${res.statusText}`);
+  }
+
+  return (await res.json()) as CompetitorInfoResponse;
+}
+
+
+// src/services/api.ts
+export interface CompetitorFeedItem {
+  id: string;
+  caption?: { text?: string };
+  image_versions2?: {
+    candidates?: { url?: string }[];
+  };
+  // …other fields you care about
+}
+
+type RawFeed = {
+  data?: { items: Array<{ node: any }> };
+  items?: Array<{ node: any }>;
+};
+
+export async function getCompetitorFeed(username: string): Promise<CompetitorFeedItem[]> {
+  const FEED_PATH = `/user/feed_v2/?username=${encodeURIComponent(username)}`;
+  const url = `https://${RAPIDAPI_HOST}${FEED_PATH}`;
+
+  const res = await fetch(url, {
+    headers: {
+      'x-rapidapi-host': RAPIDAPI_HOST,
+      'x-rapidapi-key': RAPIDAPI_KEY,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`RapidAPI Feed error: ${res.status}`);
+  }
+  const raw = (await res.json()) as RawFeed;
+
+  // pick whichever array exists
+  const wrapped: Array<{ node: any }> =
+    raw.data?.items ??
+    raw.items ??
+    [];
+
+  // unwrap .node so consumer just gets CompetitorFeedItem
+  return wrapped.map(w => w.node);
+}

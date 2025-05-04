@@ -11,6 +11,7 @@ const connectDB    = require('./config/db');
 const authRoutes   = require('./routes/authRoutes');
 const postRoutes   = require('./routes/postRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const invitationRoutes = require('./routes/invitationRoutes');
 
 // 2️⃣ Connect to MongoDB
 connectDB();
@@ -40,6 +41,19 @@ app.use('/api/uploadImage', uploadRoutes);
 app.get('/', (_, res) =>
   res.send('Postsync API is running 👍')
 );
+
+app.use('/api/invitations', invitationRoutes);
+// server/src/index.js  (or app.js)
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
+
+// server/src/index.js
+const { agenda } = require('./jobs/agenda');
+agenda.start();
+// server/src/index.js
+app.use('/api', require('./routes/postRoutes'));
+
+
 
 const PORT = process.env.PORT || 49152;
 app.listen(PORT, () =>

@@ -1,3 +1,5 @@
+![Image Not Accessible](logo.png)
+
 # PostSync - Social Media Management Application
 
 ## Overview

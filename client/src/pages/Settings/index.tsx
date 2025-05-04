@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,12 +11,26 @@ import { Instagram, Facebook, Linkedin, Twitter, X } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import Container from '@/components/ui/Container';
-
+import api from '@/services/api';
 interface ProfileFormData {
   name: string;
   email: string;
   company: string;
   role: string;
+}
+interface Invitation {
+  _id: string;
+  email: string;
+  role: 'editor' | 'viewer';
+  status: 'pending' | 'accepted' | 'declined';
+}
+
+interface TeamMember {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'editor' | 'viewer';
+  avatar?: string;
 }
 
 // Connected accounts mock data
@@ -77,85 +91,162 @@ const teamMembers = [
   }
 ];
 
+// ---------------------------------------------------------------------------
+// Settings Component
+// ---------------------------------------------------------------------------
+interface TeamMember {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'editor' | 'viewer';
+  invitationAccepted: boolean;
+  avatar?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Settings Component
+// ---------------------------------------------------------------------------
 const Settings = () => {
   const { user } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
-  const [savedSuccess, setSavedSuccess] = useState(false);
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormData>({
+
+  /* ── Profile form ─────────────────────────────────────────── */
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProfileFormData>({
     defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
+      name: user?.name ?? '',
+      email: user?.email ?? '',
       company: '',
       role: '',
-    }
+    },
   });
-  
-  const onSubmitProfile = (data: ProfileFormData) => {
-    setIsSaving(true);
-    // 🔌 BACKEND_HOOK: saveSettings('profile', data)
-    
-    // Simulate API call
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  /* ── Team & Pending state (admin only) ────────────────────── */
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+
+    const fetchData = async () => {
+      try {
+        const [mRes, pRes] = await Promise.all([
+          api.get('/users'), // returns all users
+          api.get('/users', { params: { pending: true } }), // pending only
+        ]);
+        setMembers(mRes.data.filter((u: TeamMember) => u.invitationAccepted));
+        setPendingUsers(
+          pRes.data.filter((u: TeamMember) => !u.invitationAccepted && u.role !== 'admin')
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, [user]);
+
+  /* ── Profile submit ───────────────────────────────────────── */
+  const onSubmitProfile = async (data: ProfileFormData) => {
+    setSaving(true);
+    // TODO backend call
     setTimeout(() => {
-      setIsSaving(false);
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3000);
-    }, 1000);
+      setSaving(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    }, 800);
   };
-  
-  const handleDisconnectAccount = (accountId: string) => {
-    // 🔌 BACKEND_HOOK: disconnectAccount(accountId)
-    console.log(`Disconnecting account: ${accountId}`);
+
+  /* ── Admin actions ────────────────────────────────────────── */
+  const approveUser = async (id: string) => {
+    try {
+      await api.patch(`/users/${id}/approve`, { role: 'editor' });
+      setPendingUsers((prev) => prev.filter((u) => u._id !== id));
+      const { data } = await api.get('/users');
+      setMembers(data.filter((u: TeamMember) => u.invitationAccepted));
+    } catch (err) {
+      console.error(err);
+    }
   };
-  
-  const handleConnectAccount = (accountId: string) => {
-    // 🔌 BACKEND_HOOK: connectAccount(accountId)
-    console.log(`Connecting account: ${accountId}`);
+
+  const rejectUser = async (id: string) => {
+    try {
+      await api.patch(`/users/${id}/reject`);
+      setPendingUsers((prev) => prev.filter((u) => u._id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   };
-  
-  const handleRemoveTeamMember = (memberId: string) => {
-    // 🔌 BACKEND_HOOK: removeTeamMember(memberId)
-    console.log(`Removing team member: ${memberId}`);
-  };
-  
-  const handleInviteTeamMember = (email: string, role: string) => {
-    // 🔌 BACKEND_HOOK: inviteTeamMember(email, role)
-    console.log(`Inviting team member: ${email} as ${role}`);
-  };
-  
+
+  /* ── Pending approval table ───────────────────────────────── */
+  const PendingTab = () => (
+    <div className="space-y-6">
+      <h3 className="text-lg font-medium mb-4">Pending Invitations</h3>
+      {pendingUsers.length === 0 ? (
+        <div className="border rounded-md p-4 text-center text-postsync-muted">
+          No pending invitations
+        </div>
+      ) : (
+        <table className="min-w-full border rounded-md overflow-hidden">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-postsync-muted">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-postsync-muted">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase text-postsync-muted">Action</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y">
+            {pendingUsers.map((u) => (
+              <tr key={u._id}>
+                <td className="px-6 py-4 text-sm flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={u.avatar} />
+                    <AvatarFallback>{u.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  {u.name}
+                </td>
+                <td className="px-6 py-4 text-sm">{u.email}</td>
+                <td className="px-6 py-4 text-sm space-x-2">
+                  <Button size="sm" onClick={() => approveUser(u._id)}>Approve</Button>
+                  <Button variant="outline" size="sm" onClick={() => rejectUser(u._id)}>Reject</Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
   return (
     <div className="min-h-screen pb-12">
       <Container>
         <div className="py-8">
-          <h1 className="text-2xl md:text-3xl font-bold font-inter mb-2">
-            Account Settings
-          </h1>
-          <p className="text-postsync-muted">
-            Manage your profile, connected accounts, and preferences
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold font-inter mb-2">Account Settings</h1>
+          <p className="text-postsync-muted">Manage your profile, connected accounts, and preferences</p>
         </div>
-        
+
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="mb-4">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="billing">Billing & Plan</TabsTrigger>
-            <TabsTrigger value="team">Team Members</TabsTrigger>
+            {user?.role === 'admin' && <TabsTrigger value="team">Team Members</TabsTrigger>}
           </TabsList>
-          
-          {/* Profile Tab */}
+
+          {/* Profile Tab (unchanged except state bindings) */}
           <TabsContent value="profile">
             <Card>
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
-                  Update your personal details and company information
-                </CardDescription>
+                <CardDescription>Update your personal details and company information</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit(onSubmitProfile)} className="space-y-6">
-                  <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex flex-col md:flex-row gap-8">
                     {/* Avatar */}
                     <div className="flex flex-col items-center space-y-4">
                       <Avatar className="w-24 h-24">
@@ -213,10 +304,9 @@ const Settings = () => {
                       </div>
                     </div>
                   </div>
-                  
                   <div className="flex justify-end">
-                    <Button type="submit" disabled={isSaving} className="bg-postsync-primary hover:bg-blue-700">
-                      {isSaving ? 'Saving...' : savedSuccess ? 'Saved!' : 'Save Changes'}
+                    <Button type="submit" disabled={saving} className="bg-postsync-primary hover:bg-blue-700">
+                      {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
                     </Button>
                   </div>
                 </form>
@@ -268,8 +358,8 @@ const Settings = () => {
                         variant={account.connected ? "outline" : "default"}
                         size="sm"
                         onClick={() => account.connected 
-                          ? handleDisconnectAccount(account.id)
-                          : handleConnectAccount(account.id)
+                          ? rejectUser(account.id)
+                          : approveUser(account.id)
                         }
                       >
                         {account.connected ? 'Disconnect' : 'Connect'}
@@ -534,7 +624,7 @@ const Settings = () => {
                                   variant="ghost" 
                                   size="sm"
                                   className="text-red-500"
-                                  onClick={() => handleRemoveTeamMember(member.id)}
+                                  onClick={() => rejectUser(member.id)}
                                 >
                                   <X className="h-4 w-4 mr-1" />
                                   Remove
@@ -585,6 +675,7 @@ const Settings = () => {
               </CardContent>
             </Card>
           </TabsContent>
+          {user?.role === 'admin' && <TabsContent value="team"><PendingTab /></TabsContent>}
         </Tabs>
       </Container>
     </div>

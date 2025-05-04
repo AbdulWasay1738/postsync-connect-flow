@@ -10,27 +10,27 @@ PostSync is a web-based application designed to streamline social media manageme
 
 
 
-Node.js (latest stable version recommended)
+1. Node.js (latest stable version recommended)
 
 
 
-npm (Node Package Manager)
+2. npm (Node Package Manager)
 
 
 
-Git (for cloning the repository)
+3. Git (for cloning the repository)
 
 
 
-A code editor (e.g., VS Code)
+4. A code editor (e.g., VS Code)
 
 
 
-MongoDB Atlas account (for database setup)
+5. MongoDB Atlas account (for database setup)
 
 
 
-Internet connection (for API calls and deployment)
+6. Internet connection (for API calls and deployment)
 
 ## Installation and Setup
 
@@ -42,14 +42,15 @@ Internet connection (for API calls and deployment)
 
 Clone this repository to your local machine using the following command:
 
+```bash
 git clone https://github.com/AbdulWasay1738/PostSync.git
-
+```
 
 
 Navigate to the project directory:
-
+```bash
 cd PostSync
-
+```
 **Step 2:** Install Dependencies
 
 
@@ -62,22 +63,23 @@ Open two separate command-line interfaces (e.g., Command Prompt, PowerShell, or 
 
 In the first command-line interface, navigate to the client directory: 
 
-**cd client**
-
+```bash
+cd client
+```
 Then install the client dependencies:
-
-**npm install**
-
+```bash
+npm install
+```
 
 
 In the second command-line interface, navigate to the server directory:
-
-**cd server**
-
+```bash
+cd server
+```
 Then install the server dependencies:
-
-**npm install**
-
+```bash
+npm install
+```
 
 
 Wait for the installation to complete in both command-line interfaces.
@@ -89,15 +91,15 @@ Wait for the installation to complete in both command-line interfaces.
 
 
 In the server command-line interface, start the server by running:
-
-**npm run dev**
-
+```bash
+npm run dev
+```
 
 
 Once the server is running, in the client command-line interface, start the client by running:
-
-**npm run dev**
-
+```bash
+npm run dev
+```
 
 
 The client interface will display a local host address (e.g., http://localhost:3000). Copy this address and paste it into your preferred web browser to access the application.
@@ -108,19 +110,19 @@ The client interface will display a local host address (e.g., http://localhost:3
 
 
 
-Log or Sign up in using email credentials.
+- Log or Sign up in using email credentials.
 
 
 
-Use the dashboard to compose posts, schedule them, and post to Instagram, Facebook, or LinkedIn.
+- Use the dashboard to compose posts, schedule them, and post to Instagram, Facebook, or LinkedIn.
 
 
 
-Upload images to generate captions via the integrated Gemini API.
+- Upload images to generate captions via the integrated Gemini API.
 
 
 
-Manage profiles, drafts, and settings as per the user interface.
+- Manage profiles, drafts, and settings as per the user interface.
 
 **Development Notes**
 
@@ -128,15 +130,15 @@ Manage profiles, drafts, and settings as per the user interface.
 
 
 
-The application follows the SCRUM methodology with three sprints
+- The application follows the SCRUM methodology with three sprints
 
 
 
-Trello boards and GitHub commits track progress.
+- Trello boards and GitHub commits track progress.
 
 
 
-The project is deployed on Hostinger; for production, update the .env file with production API keys and database URLs.
+- The project is deployed on Hostinger; for production, update the .env file with production API keys and database URLs.
 
 **Contributing**
 

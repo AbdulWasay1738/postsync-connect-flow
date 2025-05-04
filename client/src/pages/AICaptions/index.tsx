@@ -10,6 +10,7 @@ import Container from '@/components/ui/Container';
 import { generateCaption } from '@/services/api';
 
 const AICaptions = () => {
+  
   const [searchParams] = useSearchParams();
   const preloaded = searchParams.get('image') || '';
 
@@ -63,7 +64,8 @@ const AICaptions = () => {
 
   return (
     <div className="min-h-screen pb-12">
-      <Container>
+      
+      <Container className="pt-12">
         <h1 className="text-3xl font-bold mb-2">AI Caption Generator</h1>
         <p className="text-postsync-muted mb-8">
           Create engaging captions and hashtags with AI

@@ -46,7 +46,7 @@ const CompetitorAnalysis: React.FC = () => {
   };
 
   return (
-    <Container>
+    <Container className="pt-12">
       {/* Header */}
       <div className="py-6">
         <h1 className="text-2xl font-bold">Competitor Analysis</h1>
@@ -56,14 +56,14 @@ const CompetitorAnalysis: React.FC = () => {
       </div>
 
       {/* Search Bar */}
-      <Card className="mb-6">
-        <CardContent className="flex items-center space-x-3">
+      <Card className="pt-6">
+        <CardContent className="flex items-center">
           <AtSign className="text-xl text-muted-foreground" />
           <Input
             placeholder="e.g. adambobrow"
             value={username}
             onChange={e => setUsername(e.target.value)}
-            className="flex-1"
+            className="flex-1 rounded-r-none"
           />
           <Button
             onClick={handleAnalyze}

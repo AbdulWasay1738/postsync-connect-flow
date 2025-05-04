@@ -25,7 +25,8 @@ export interface PostPayload {
 
 export async function publishPost(payload: PostPayload) {
   const res = await fetch(
-    `${API_URL}/post`,
+    // ← note the double “post/post”
+    `${API_URL}/post/post`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -38,6 +39,7 @@ export async function publishPost(payload: PostPayload) {
   }
   return res.json();
 }
+
 
 
 // uploadImage → sends FormData & returns the hosted URL
@@ -113,7 +115,7 @@ export interface CompetitorInfoResponse {
 
 // hard-coded RapidAPI credentials:
 const RAPIDAPI_HOST = 'instagram-scraper-ai1.p.rapidapi.com';
-const RAPIDAPI_KEY  = 'd3de603ec2msh2997cef1c9f512bp1cd1a7jsn0875fb2f085f';
+const RAPIDAPI_KEY  = '0fff1f066cmsh71bd48f59338126p176cbbjsn98671fe75e31';
 
 export async function getCompetitorInfo(
   username: string
@@ -175,4 +177,27 @@ export async function getCompetitorFeed(username: string): Promise<CompetitorFee
 
   // unwrap .node so consumer just gets CompetitorFeedItem
   return wrapped.map(w => w.node);
+}
+
+
+
+
+export interface SchedulePayload {
+  caption: string;
+  imageUrl?: string;
+  platforms: string[];
+  scheduledAt: string;
+}
+
+export async function schedulePost(payload: SchedulePayload) {
+  const res = await fetch('/api/post', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Schedule error: ${res.status} ${text}`);
+  }
+  return res.json();
 }

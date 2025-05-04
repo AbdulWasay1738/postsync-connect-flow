@@ -45,6 +45,7 @@ const Sidebar = ({ children }: SidebarProps) => {
     { title: 'Calendar', path: '/calendar', icon: <CalendarDays size={20} /> },
     { title: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
     { title: 'Create Post', path: '/create', icon: <PlusCircle size={20} /> },
+    { title: 'Schedule',     path: '/schedule-post', icon: <CalendarDays size={20} /> },
     { title: 'AI Captions', path: '/ai-captions', icon: <Sparkles size={20} /> },
     { title: 'Competitor Analysis', path: '/competitor-analysis', icon: <Users size={20} /> },
     { title: 'Settings', path: '/settings', icon: <Settings size={20} /> },
